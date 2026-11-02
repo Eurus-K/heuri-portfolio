@@ -9,6 +9,7 @@
  */
 import { COMPASS } from '../data/content.js';
 import { range, lerp, ease, fx, typeText } from '../lib/util.js';
+import { setCompassSky } from '../lib/sky.js';
 
 const PROMPT = '台灣手工鳳梨酥，想試探南加州與新加坡的通路。';
 
@@ -54,18 +55,26 @@ export function createCompass(root) {
   });
 
   let last = -1;
-  function update(p, force) {
-    if (!force && Math.abs(p - last) < 1e-5) return;
-    last = p;
+  function update(raw, force) {
+    if (!force && Math.abs(raw - last) < 1e-5) return;
+    last = raw;
+    // the first screen is shared with the map leaving above (sections overlap),
+    // so the compass timeline starts once the map has scrolled away
+    const s0 = innerHeight / Math.max(1, root.offsetHeight - innerHeight);
+    const p = range(raw, s0, 1);
+    const arrive = ease.out(range(raw, s0 * 0.85, s0 + 0.04));
 
     // needle: searches, overshoots, settles on a heading
     const n = range(p, 0.02, 0.26);
     const angle = lerp(-140, 52, ease.out(n)) + Math.sin(n * Math.PI * 3) * 18 * (1 - n);
     needle.setAttribute('transform', `rotate(${angle})`);
 
+    // daybreak: carries on from the map's dawn (0.65) and climbs as the window opens
+    setCompassSky(raw > 0 ? lerp(0.65, 1.7, ease.inOut(range(p, 0.05, 0.5))) : null);
+
     const open = ease.inOutQuart(range(p, 0.28, 0.44));
-    fx(head, 1 - range(p, 0.26, 0.34), -range(p, 0.26, 0.34) * 30);
-    rose.style.opacity = 1 - open;
+    fx(head, arrive * (1 - range(p, 0.26, 0.34)), (1 - arrive) * 40 - range(p, 0.26, 0.34) * 30);
+    rose.style.opacity = arrive * (1 - open);
     rose.style.transform = `translateY(-50%) scale(${1 - open * 0.6}) rotate(${open * 90}deg)`;
 
     // window: opens from a line, then goes full-bleed

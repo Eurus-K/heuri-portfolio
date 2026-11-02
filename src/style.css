@@ -387,11 +387,13 @@ body.is-light .logo { color: var(--sheet-ink); }
 .cited__note { font-family: var(--f-zh); font-size: 12px; color: var(--fg-3); letter-spacing: 0.02em; }
 
 /* ═════════ MAP ═════════ */
-/* flat night carries on from NURSTYLE; NURSTYLE's empty last screen is shared */
-.scene--map { margin-top: -100vh; }
-.scene--map .stage, .scene--compass .stage { background: var(--night); }
-.dawn {
-  position: absolute; inset: 0; opacity: 0; pointer-events: none;
+/* map and compass share one fixed sky and overlap the previous section's last
+   screen, so there is never a seam between them */
+.scene--map, .scene--compass { margin-top: -100vh; }
+#scroller { position: relative; z-index: 1; }
+.sky-global { position: fixed; inset: 0; z-index: 0; background: var(--night); opacity: 0; pointer-events: none; overflow: hidden; }
+.sky-global__dawn {
+  position: absolute; inset: 0; opacity: 0; transform-origin: 50% 100%;
   background: radial-gradient(130% 70% at 50% 120%, #f6c2aa 0%, #e4908a 20%, #9e4e6e 42%, rgba(60, 28, 52, 0.5) 66%, transparent 92%);
   will-change: transform, opacity;
 }

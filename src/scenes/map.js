@@ -14,6 +14,7 @@ import land110 from 'world-atlas/land-110m.json';
 import taiwan from '../data/taiwan.json'; // Natural Earth 50m, so the island reads as a shape
 import { ORIGIN, DESTINATIONS } from '../data/content.js';
 import { range, ease, fx } from '../lib/util.js';
+import { setMapSky } from '../lib/sky.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const land = feature(land110, land110.objects.land);
@@ -29,7 +30,6 @@ export function createMap(root) {
   const head = $('#mapHead');
   const rows = [...root.querySelectorAll('.shift__row')];
   const question = $('#question');
-  const dawn = $('#dawn');
 
   const canvas = document.createElement('canvas');
   canvas.className = 'map__dots';
@@ -160,8 +160,7 @@ export function createMap(root) {
 
     // dawn: rises with the routes, brightest at 1.0 → 2.0, settles for the question
     const rise = ease.inOut(range(p, 0.24, 0.7));
-    dawn.style.opacity = rise * (1 - q * 0.35);
-    dawn.style.transform = `translateY(${(1 - rise) * 30}vh)`;
+    setMapSky(p, rise * (1 - q * 0.35));
     svg.style.opacity = dim;
     labelsEl.style.opacity = 1 - q;
 

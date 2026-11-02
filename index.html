@@ -21,6 +21,9 @@
       <div class="hud__keys">→ / Space / PgDn next · ← / PgUp prev · 1–4 chapter · T reset timer · F fullscreen · P hide</div>
     </aside>
 
+    <!-- one sky behind the map and Export Compass, so they hand over without a seam -->
+    <div class="sky-global" id="skyGlobal"><div class="sky-global__dawn" id="skyDawn"></div></div>
+
     <main id="scroller">
       <!-- ═════════ 01 OPENING GALLERY → orb → INTERPRETER ═════════ -->
       <section class="scene scene--open" id="open" data-chapter="0" style="--len: 1128">
@@ -92,8 +95,6 @@
       <!-- ═════════ 03 FROM EXPERIENCE TO AI — World map ═════════ -->
       <section class="scene scene--map" id="map" data-chapter="2" style="--len: 700">
         <div class="stage">
-          <!-- dawn: light rises from the horizon as the routes go out -->
-          <div class="dawn" id="dawn"></div>
           <svg class="map__svg" id="mapSvg" aria-hidden="true"></svg>
           <div class="map__labels" id="mapLabels"></div>
 
@@ -122,12 +123,10 @@
       </section>
 
       <!-- ═════════ 04 EXPORT COMPASS ═════════ -->
-      <section class="scene scene--compass dark" id="compass" data-chapter="3" style="--len: 450">
+      <section class="scene scene--compass" id="compass" data-chapter="3" style="--len: 550">
         <div class="stage">
           <div class="cmp__head" id="cmpHead">
-            <p class="mono">04 — Working prototype</p>
             <h2 class="cmp__title">Export<br />Compass</h2>
-            <p class="cmp__zh">AI 市場探索工作台</p>
           </div>
           <svg class="cmp__rose" id="cmpRose" viewBox="-100 -100 200 200" aria-hidden="true">
             <circle r="96" />
