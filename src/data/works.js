@@ -9,6 +9,10 @@
  *   tone    placeholder colour (ignored once `src` is set, still used as loading bg)
  *   src     '/works/brand-01.jpg' | '/works/ai-03.mp4'   (optional)
  *   audio   '/audio/track-01.mp3'  (MUSIC only, optional — playback reserved for v2)
+ *   size    relative frame size (optional; small for low-resolution sources)
+ *
+ * Order = order of appearance in the flight. The four 'Photo to come' slots
+ * are waiting for phone photos: add `src` and the real `ratio`.
  */
 
 export const CATEGORIES = {
@@ -20,32 +24,32 @@ export const CATEGORIES = {
 };
 
 export const WORKS = [
-  { id: 'w01', cat: 'BRAND', title: 'Untitled Identity', year: 2025, ratio: 16 / 10, tone: '#E8E4DA' },
-  { id: 'w02', cat: 'MUSIC', title: 'Single Cover I', year: 2025, ratio: 1, tone: '#D9573A' },
-  { id: 'w03', cat: 'PACK', title: 'Tea Series', year: 2024, ratio: 4 / 5, tone: '#CDBFA6' },
-  { id: 'w04', cat: 'AI', title: 'Synthetic Still 01', year: 2025, ratio: 2 / 3, tone: '#5E6B7A' },
-  { id: 'w05', cat: 'PRINT', title: 'Poster A1', year: 2023, ratio: 1 / 1.414, tone: '#F2EFE8' },
-  { id: 'w06', cat: 'BRAND', title: 'Wordmark Study', year: 2024, ratio: 4 / 3, tone: '#7D8466' },
-  { id: 'w07', cat: 'MUSIC', title: 'EP Artwork', year: 2024, ratio: 1, tone: '#48484A' },
-  { id: 'w08', cat: 'AI', title: 'Generated Landscape', year: 2025, ratio: 16 / 9, tone: '#9DAA97' },
-  { id: 'w09', cat: 'PACK', title: 'Gift Box', year: 2023, ratio: 1, tone: '#C9A24A' },
-  { id: 'w10', cat: 'PRINT', title: 'Editorial Spread', year: 2024, ratio: 3 / 2, tone: '#E6E1D6' },
-  { id: 'w11', cat: 'BRAND', title: 'Signage System', year: 2025, ratio: 3 / 4, tone: '#3256C8' },
-  { id: 'w12', cat: 'AI', title: 'Portrait Series', year: 2025, ratio: 4 / 5, tone: '#B2694F' },
-  { id: 'w13', cat: 'MUSIC', title: 'Album Cover', year: 2023, ratio: 1, tone: '#D7D2C8' },
-  { id: 'w14', cat: 'PRINT', title: 'Exhibition Poster', year: 2024, ratio: 1 / 1.414, tone: '#57534E' },
-  { id: 'w15', cat: 'PACK', title: 'Label System', year: 2025, ratio: 5 / 4, tone: '#8C99A6' },
-  { id: 'w16', cat: 'BRAND', title: 'Brand Guidelines', year: 2024, ratio: 16 / 10, tone: '#CFC7B8' },
-  { id: 'w17', cat: 'AI', title: 'Motion Frame', year: 2025, ratio: 9 / 16, tone: '#6C5A72' },
-  { id: 'w18', cat: 'MUSIC', title: 'Single Cover II', year: 2025, ratio: 1, tone: '#E4572E' },
-  { id: 'w19', cat: 'PRINT', title: 'Type Specimen', year: 2023, ratio: 3 / 4, tone: '#ECE8E0' },
-  { id: 'w20', cat: 'PACK', title: 'Bottle Wrap', year: 2024, ratio: 2 / 3, tone: '#A39E93' },
-  { id: 'w21', cat: 'BRAND', title: 'Campaign Key Visual', year: 2025, ratio: 21 / 9, tone: '#4A5866' },
-  { id: 'w22', cat: 'AI', title: 'Texture Study', year: 2024, ratio: 1, tone: '#BFB6A6' },
-  { id: 'w23', cat: 'MUSIC', title: 'Mixtape', year: 2024, ratio: 1, tone: '#9EC3E6' },
-  { id: 'w24', cat: 'PRINT', title: 'Zine Cover', year: 2025, ratio: 4 / 5, tone: '#9C3B2C' },
-  { id: 'w25', cat: 'PACK', title: 'Seasonal Edition', year: 2025, ratio: 3 / 4, tone: '#E7E1D4' },
-  { id: 'w26', cat: 'BRAND', title: 'Stationery', year: 2023, ratio: 1.414, tone: '#AFA899' },
-  { id: 'w27', cat: 'AI', title: 'Speculative Object', year: 2025, ratio: 4 / 5, tone: '#76706A' },
-  { id: 'w28', cat: 'MUSIC', title: 'Live Session', year: 2025, ratio: 1, tone: '#6B7468' },
+  { id: 'w01', cat: 'BRAND', title: 'NURSTYLE Key Visual', ratio: 1181 / 1400, tone: '#2c2228', src: '/works/nurstyle-banner.webp' },
+  { id: 'w02', cat: 'MUSIC', title: '가만히 있지 않아', ratio: 1254 / 1254, tone: '#2c2228', src: '/works/music-gamanhi.webp' },
+  { id: 'w03', cat: 'AI', title: 'SCOUT LAB Character IP', ratio: 614 / 819, tone: '#2c2228', src: '/works/scout-lab.webp' },
+  { id: 'w04', cat: 'PRINT', title: 'NURSTYLE Vol.16', ratio: 342 / 319, tone: '#2c2228', src: '/works/nurstyle-vol16.webp', size: 0.42 },
+  { id: 'w05', cat: 'MUSIC', title: '흥흥흥', ratio: 1254 / 1254, tone: '#2c2228', src: '/works/music-heungheung.webp' },
+  { id: 'w06', cat: 'PACK', title: 'Photo to come', ratio: 4 / 5, tone: '#4a3a44' }, // ← phone photo slot 1
+  { id: 'w07', cat: 'PACK', title: 'NURSTYLE Shipping Boxes', ratio: 1120 / 1400, tone: '#2c2228', src: '/works/nurstyle-boxes.webp' },
+  { id: 'w08', cat: 'AI', title: 'BAD TUTU', ratio: 1254 / 1254, tone: '#2c2228', src: '/works/bad-tutu.webp' },
+  { id: 'w09', cat: 'PRINT', title: 'NURSTYLE Vol.01', ratio: 1400 / 1269, tone: '#2c2228', src: '/works/nurstyle-vol01.webp' },
+  { id: 'w10', cat: 'BRAND', title: 'Baking Passport', ratio: 484 / 562, tone: '#2c2228', src: '/works/itri-baking.webp', size: 0.7 },
+  { id: 'w11', cat: 'PRINT', title: 'NURSTYLE Live BINGO', ratio: 614 / 732, tone: '#2c2228', src: '/works/nurstyle-bingo.webp' },
+  { id: 'w12', cat: 'PACK', title: 'Photo to come', ratio: 4 / 5, tone: '#5c4a52' }, // ← phone photo slot 2
+  { id: 'w13', cat: 'PACK', title: '4D Motion Wear', ratio: 603 / 898, tone: '#2c2228', src: '/works/nurstyle-4d.webp' },
+  { id: 'w14', cat: 'MUSIC', title: 'Room Tone', ratio: 1241 / 1241, tone: '#2c2228', src: '/works/music-roomtone.webp' },
+  { id: 'w15', cat: 'PRINT', title: 'In Motion, Still Precise', ratio: 654 / 861, tone: '#2c2228', src: '/works/nurstyle-motion.webp' },
+  { id: 'w16', cat: 'PACK', title: 'NURSTYLE Logistics Box', ratio: 922 / 1276, tone: '#2c2228', src: '/works/nurstyle-box.webp' },
+  { id: 'w17', cat: 'AI', title: 'Trick or Treat', ratio: 805 / 1400, tone: '#2c2228', src: '/works/itri-trick.webp' },
+  { id: 'w18', cat: 'PACK', title: 'Photo to come', ratio: 4 / 5, tone: '#3e3640' }, // ← phone photo slot 3
+  { id: 'w19', cat: 'PRINT', title: 'IG #hashtag Mission', ratio: 614 / 733, tone: '#2c2228', src: '/works/nurstyle-hashtag.webp' },
+  { id: 'w20', cat: 'PRINT', title: 'NURSTYLE Vol.14', ratio: 343 / 319, tone: '#2c2228', src: '/works/nurstyle-vol14.webp', size: 0.42 },
+  { id: 'w21', cat: 'PRINT', title: 'Lucky Project', ratio: 664 / 840, tone: '#2c2228', src: '/works/nurstyle-lucky.webp' },
+  { id: 'w22', cat: 'MUSIC', title: '윤율 FM', ratio: 714 / 793, tone: '#2c2228', src: '/works/music-yunyul.webp' },
+  { id: 'w23', cat: 'BRAND', title: 'Brand Proposition', ratio: 710 / 1079, tone: '#2c2228', src: '/works/nurstyle-brand.webp' },
+  { id: 'w24', cat: 'PACK', title: 'Photo to come', ratio: 4 / 5, tone: '#544650' }, // ← phone photo slot 4
+  { id: 'w25', cat: 'PRINT', title: 'Take Care Project', ratio: 666 / 734, tone: '#2c2228', src: '/works/nurstyle-survey.webp' },
+  { id: 'w26', cat: 'PRINT', title: 'Special Offer', ratio: 615 / 730, tone: '#2c2228', src: '/works/nurstyle-offer.webp' },
+  { id: 'w27', cat: 'PRINT', title: 'NURSTYLE Vol.15', ratio: 340 / 319, tone: '#2c2228', src: '/works/nurstyle-vol15.webp', size: 0.42 },
+  { id: 'w28', cat: 'PACK', title: 'Try-on Sticker', ratio: 355 / 626, tone: '#2c2228', src: '/works/nurstyle-sticker.webp', size: 0.5 },
 ];

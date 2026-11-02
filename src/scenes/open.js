@@ -71,10 +71,11 @@ export function createOpen(root) {
     if (w.cat === 'MUSIC') el.addEventListener('click', () => toggleMusic(el, w));
 
     const central = i % 4 === 2;
+    const rs = 0.55 + r() * 0.8; // drawn even when overridden, so the layout stays stable
     const batch = batchOf[i % batchOf.length];
     return {
       w, el, i,
-      size: 0.55 + r() * 0.8, // relative area
+      size: w.size ?? rs, // relative area
       theta: i * 2.39996 + 3.88,
       radius: central ? 0.12 + r() * 0.1 : 0.42 + r() * 0.36,
       zJitter: (r() - 0.5) * 160,
