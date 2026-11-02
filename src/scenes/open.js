@@ -11,8 +11,9 @@
  *  0.29 ─ 0.62  ABSORB     the orb forms; each status line pulls in one batch
  *  0.37 ─ 0.64  STATUS     three lines, each with its own orb palette
  *  0.645─ 0.69  SHRINK     the orb quietly shrinks away
- *  0.70 ─ 0.83  INTERPRETER   alone; letters slide in, slide out
- *  0.855─ 1.00  80/20      100 cells; 20 remain
+ *  0.70 ─ 0.79  INTERPRETER   alone; letters slide in (and out, scrolling back)
+ *  0.79 ─ 0.845 LOGO       the word glides up and becomes the top-centre logo
+ *  0.86 ─ 1.00  80/20      number and one Chinese line rise from below
  */
 import { WORKS, CATEGORIES } from '../data/works.js';
 import { STATUS_LINES } from '../data/content.js';
@@ -26,7 +27,8 @@ const TYPE_MS = 38; // per character
 // batch k is absorbed starting here: one while the orb forms, one per status line
 const BATCH_AT = [0.305, ...STATUS_AT.map((a) => a - 0.005)];
 const BATCH_SIZES = [6, 7, 7, 8];
-const WORD_IN = 0.7, WORD_OUT = 0.83;
+const WORD_IN = 0.7;
+const LOGO_AT = [0.79, 0.845]; // INTERPRETER → logo glide
 const ABSORB_LEN = 0.04; // per work
 const SWIRL = 1.1; // radians turned while spiralling in
 const RIPPLE_S = 1.3; // ripple lifetime (seconds)
@@ -40,8 +42,9 @@ export function createOpen(root) {
   const statusText = $('#orbText');
   const dots = $('#orbDots');
   const word = $('#interp');
-  const pGrid = $('#paretoGrid');
-  const pTextEls = [...root.querySelectorAll('.pareto__text > *')];
+  const logo = document.getElementById('logo');
+  const pNum = $('.pareto__num');
+  const pZh = $('.pareto__zh');
   const orb = createOrb(canvas);
 
   // ── works ─────────────────────────────────────────────────
@@ -82,17 +85,6 @@ export function createOpen(root) {
     };
   });
 
-  // ── 80/20 cells ───────────────────────────────────────────
-  const r2 = rng(80);
-  const keyCells = new Set();
-  while (keyCells.size < 20) keyCells.add(Math.floor(r2() * 100));
-  const cells = Array.from({ length: 100 }, (_, k) => {
-    const el = document.createElement('i');
-    if (keyCells.has(k)) el.className = 'k';
-    pGrid.appendChild(el);
-    return { el, k, key: keyCells.has(k), d: r2(), dx: 0, dy: 0 };
-  });
-
   // ── INTERPRETER letters ───────────────────────────────────
   const letters = [...word.textContent.trim()].map((ch) => {
     const s = document.createElement('span');
@@ -105,7 +97,8 @@ export function createOpen(root) {
   letters.forEach((s) => word.appendChild(s));
 
   // ── layout ────────────────────────────────────────────────
-  let vw, vh, Cmax, orbSize = 160, cellSize = 10;
+  let vw, vh, Cmax, orbSize = 160;
+  const toLogo = { dy: 0, k: 0.2 }; // how far / how much the word travels to become the logo
   const SPACING = 430;
 
   function layout() {
@@ -146,19 +139,10 @@ export function createOpen(root) {
     orb.resize(orbSize * 1.2); // canvas includes room for the outer glow
     statusEl.style.setProperty('--status-y', orbSize * 0.5 + Math.max(24, vh * 0.035) + 'px');
 
-    // 80/20 grid — cells unfold from the centre of the screen
-    const g = pGrid.getBoundingClientRect();
-    const step = g.width / 10;
-    cellSize = step * 0.74;
-    cells.forEach((c) => {
-      const col = c.k % 10, row = Math.floor(c.k / 10);
-      const left = col * step + (step - cellSize) / 2;
-      const top = row * step + (step - cellSize) / 2;
-      c.el.style.cssText += `;left:${left}px;top:${top}px;width:${cellSize}px;height:${cellSize}px`;
-      c.dx = vw / 2 - (g.left + left + cellSize / 2);
-      c.dy = vh / 2 - (g.top + top + cellSize / 2);
-      c.el._fx = null;
-    });
+    // the logo's position and size, so the word can land exactly on it
+    const lr = logo.getBoundingClientRect();
+    toLogo.dy = lr.top + lr.height / 2 - vh / 2;
+    toLogo.k = parseFloat(getComputedStyle(logo).fontSize) / parseFloat(getComputedStyle(word).fontSize);
   }
 
   // ── mouse parallax (gallery only) ─────────────────────────
@@ -226,7 +210,6 @@ export function createOpen(root) {
     if (!force && !floating && Math.abs(p - lastP) < 1e-5) return;
     lastP = p;
 
-    document.body.classList.toggle('is-intro', p < 0.855); // the word stands alone
     const now = performance.now() / 1000;
 
     // orb size first: works vanish when they reach its rim
@@ -327,31 +310,25 @@ export function createOpen(root) {
     }
     statusEl.style.opacity = k < 0 ? 0 : 1 - range(p, STATUS_AT[k] + STATUS_LEN - 0.014, STATUS_AT[k] + STATUS_LEN);
 
-    // ── INTERPRETER — plays whole on entry, leaves on exit (either direction) ──
-    const inside = p >= WORD_IN && p < WORD_OUT;
+    // ── INTERPRETER — plays whole on entry; leaves only when scrolling back ──
+    const inside = p >= WORD_IN;
     if (inside !== wordIn) {
       wordIn = inside;
       inside ? wordEnter() : wordExit();
     }
 
-    // ── 80/20 ──
-    const live = p >= 0.855;
-    const dim = range(p, 0.915, 0.94);
-    pGrid.classList.toggle('is-split', dim > 0.5);
-    for (const c of cells) {
-      if (!live) { if (c.el._fx !== 'h') { c.el._fx = 'h'; c.el.style.opacity = 0; } continue; }
-      const t = ease.inOutQuart(range(p, 0.855 + c.d * 0.035, 0.895 + c.d * 0.035));
-      const o = (c.key ? 1 : 1 - dim * 0.86) * Math.min(1, t * 4);
-      const key = `${t.toFixed(4)}|${o.toFixed(3)}`;
-      if (c.el._fx === key) continue;
-      c.el._fx = key;
-      c.el.style.opacity = o;
-      c.el.style.transform = `translate(${c.dx * (1 - t)}px, ${c.dy * (1 - t)}px) scale(${t})`;
-    }
-    pTextEls.forEach((el, i) => {
-      const t = range(p, 0.925 + i * 0.014, 0.95 + i * 0.014);
-      fx(el, t, (1 - t) * 22);
-    });
+    // ── then glides up and becomes the logo (the only chrome from here on) ──
+    const g = ease.inOut(range(p, LOGO_AT[0], LOGO_AT[1]));
+    const landed = p >= LOGO_AT[1];
+    word.style.transform = `translate(-50%, -50%) translateY(${toLogo.dy * g}px) scale(${lerp(1, toLogo.k, g)})`;
+    word.style.visibility = landed ? 'hidden' : 'visible';
+    logo.style.opacity = landed ? 1 : 0;
+
+    // ── 80/20 — rises from below, scroll-driven ──
+    const tn = ease.out(range(p, 0.86, 0.91));
+    const tz = ease.out(range(p, 0.885, 0.935));
+    fx(pNum, tn, (1 - tn) * 90);
+    fx(pZh, tz, (1 - tz) * 60);
   }
 
   layout();

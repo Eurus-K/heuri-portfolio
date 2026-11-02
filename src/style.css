@@ -32,6 +32,7 @@
   --t-h3: clamp(20px, 1.7vw, 30px);
   --t-body: clamp(16px, 1.15vw, 20px);
   --t-label: 13px;
+  --t-logo: 17px;
 
   --gutter: clamp(16px, 2.6vw, 44px);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -62,29 +63,23 @@ em { font-style: normal; color: var(--fg-2); }
 .dim { color: var(--fg-3); }
 .accent { color: var(--accent-2); }
 
-/* ─────────────── Chrome ─────────────── */
+/* ─────────────── Chrome: a single logo, top centre ─────────────── */
 .chrome {
-  position: fixed; inset: 0;
+  position: fixed; left: 0; right: 0; top: 0;
   pointer-events: none;
   z-index: 50;
-  color: var(--fg);
-  transition: opacity 0.8s var(--ease);
+  display: flex; justify-content: center;
+  padding-top: var(--gutter);
+  transition: opacity 0.6s var(--ease);
 }
-body.is-intro .chrome,
 body.is-handoff .chrome { opacity: 0; }
-.chrome > div { position: absolute; display: flex; gap: 18px; align-items: baseline; }
-.chrome__tl { top: var(--gutter); left: var(--gutter); }
-.chrome__tr { top: var(--gutter); right: var(--gutter); gap: 12px !important; }
-.chrome__tr .dim { color: var(--fg-3); }
-.chrome__chapter { color: var(--fg-2); }
-.chrome__bl { bottom: calc(var(--gutter) + 8px); left: var(--gutter); transition: opacity 0.6s; }
-.chrome__br { bottom: calc(var(--gutter) + 8px); right: var(--gutter); }
-.mark { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
-.progress { position: absolute; left: var(--gutter); right: var(--gutter); bottom: var(--gutter); height: 1px; }
-.progress::before { content: ''; position: absolute; inset: 0; background: var(--line); }
-.progress__fill {
-  position: absolute; inset: 0; transform-origin: 0 50%; transform: scaleX(0);
-  background: var(--fg-2);
+.logo {
+  font-size: var(--t-logo);
+  font-weight: 600;
+  letter-spacing: -0.025em; /* same as the hero word, so the hand-off is seamless */
+  opacity: 0;
+  line-height: 1;
+  color: var(--fg);
 }
 
 /* ─────────────── Presenter HUD ─────────────── */
@@ -196,33 +191,26 @@ body.is-handoff .chrome { opacity: 0; }
 }
 .interp span { will-change: transform, opacity; }
 
-/* 80/20 */
+/* 80/20 — centred, rises from below (Maze-style, scroll-driven) */
 .pareto {
   position: absolute; inset: 0; pointer-events: none;
-  display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 0 var(--gutter);
+  text-align: center;
 }
-.pareto__grid { position: relative; justify-self: center; width: min(36vw, 60vh); aspect-ratio: 1; }
-.pareto__grid i {
-  position: absolute; background: var(--fg); border-radius: 2px;
-  opacity: 0;
-  transition: background-color 0.5s var(--ease);
-}
-.pareto__grid.is-split i.k { background: var(--accent); }
-.pareto__text > * { opacity: 0; }
+.pareto > * { opacity: 0; will-change: transform, opacity; }
 .pareto__num {
-  font-weight: 600; font-size: clamp(80px, 11vw, 210px);
+  font-weight: 600; font-size: clamp(96px, 12.5vw, 240px);
   letter-spacing: -0.045em; line-height: 0.9;
   font-variant-numeric: tabular-nums;
 }
 .pareto__num i { font-style: normal; font-weight: 300; color: var(--fg-3); margin: 0 0.02em; }
 .pareto__num span:last-child { color: var(--accent); }
 .pareto__zh {
-  margin-top: 4vh;
+  margin-top: 5vh;
   font-family: var(--f-zh); font-weight: 600;
-  font-size: var(--t-h2); line-height: 1.3; letter-spacing: 0;
+  font-size: var(--t-h2); line-height: 1.35; letter-spacing: 0;
 }
-.pareto__en { margin-top: 2vh; font-size: var(--t-h3); color: var(--fg-2); letter-spacing: -0.01em; }
 
 /* ═════════ NURSTYLE ═════════ */
 .nur__head { position: absolute; left: var(--gutter); top: 15vh; z-index: 3; }
@@ -396,9 +384,7 @@ body.is-handoff .chrome { opacity: 0; }
 .window.is-interactive ~ .enter { display: none; }
 
 @media (max-width: 760px) {
-  .pareto { grid-template-columns: 1fr; align-content: center; gap: 4vh; }
   .nur__cols { grid-template-columns: repeat(2, 1fr); }
   .ai { width: calc(100vw - 2 * var(--gutter)); }
   .preview__mods { grid-template-columns: repeat(2, 1fr); }
-  .chrome__tr { display: none !important; }
 }

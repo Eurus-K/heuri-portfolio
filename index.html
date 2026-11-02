@@ -6,26 +6,15 @@
     <title>INTERPRETER</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='5' fill='%232F7BFF'/%3E%3C/svg%3E" />
   </head>
-  <body class="is-intro">
-    <!-- ───────────── Fixed chrome ───────────── -->
+  <body>
+    <!-- ───────────── Fixed chrome: one logo, top centre (like Dipper) ───────────── -->
     <header class="chrome" id="chrome">
-      <div class="chrome__tl">
-        <span class="mark">INTERPRETER</span>
-        <span class="chrome__chapter mono" id="chapterLabel">00 — Opening Gallery</span>
-      </div>
-      <div class="chrome__tr mono">
-        <span id="profileName"></span>
-        <span class="dim" id="profileMeta"></span>
-      </div>
-      <div class="chrome__bl mono" id="hint">Scroll&nbsp;/&nbsp;→ to begin</div>
-      <div class="chrome__br mono"><span id="chapterIdx">01</span><span class="dim">&nbsp;/&nbsp;04</span></div>
-      <div class="progress" id="progress">
-        <div class="progress__fill" id="progressFill"></div>
-      </div>
+      <span class="logo" id="logo">INTERPRETER</span>
     </header>
 
     <!-- Presenter HUD (press P) -->
     <aside class="hud mono" id="hud" hidden>
+      <div class="hud__row"><span>CHAPTER</span><b id="hudChapter">01</b></div>
       <div class="hud__row"><span>BEAT</span><b id="hudBeat">1/1</b></div>
       <div class="hud__row"><span>TIME</span><b id="hudTime">0:00</b></div>
       <div class="hud__note" id="hudNote"></div>
@@ -50,12 +39,8 @@
 
           <!-- 80/20 -->
           <div class="pareto" id="pareto">
-            <div class="pareto__grid" id="paretoGrid"></div>
-            <div class="pareto__text">
-              <p class="pareto__num"><span>80</span><i>/</i><span>20</span></p>
-              <p class="pareto__zh">從複雜的問題中，<br />找出最值得投入的切入點。</p>
-              <p class="pareto__en">Find the 20% that moves the other 80%.</p>
-            </div>
+            <p class="pareto__num"><span>80</span><i>/</i><span>20</span></p>
+            <p class="pareto__zh">從複雜的問題中，找出最值得投入的切入點。</p>
           </div>
         </div>
       </section>

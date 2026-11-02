@@ -43,7 +43,7 @@ Layout and animation are generated from the data, so nothing else needs changing
 | --- | --- | --- | --- |
 | 1 | **Works, 20–28 pieces** (brand / packaging / graphic / AI / music covers, 4–6 per category) | JPG or WebP, **longest side 1600px**, under 400KB each; sRGB | Name files as `category-number`, e.g. `pack-03.webp`. Add a title and year for each |
 | 2 | **Order of the works** | Just list the file names in order | The first few appear in the opening frame, so put your strongest pieces first |
-| 3 | **Your name** (CN/EN display form) | Text | Shown in the top-right corner |
+| 3 | **Your name** (CN/EN display form) | Text | Not shown on screen right now (the only chrome is the INTERPRETER logo); useful if you want a closing credit |
 | 4 | **Export Compass demo URL** | localhost or a deployed URL | Embedded in the final window with an "Enter demo" button. If the site refuses iframes, set `openInIframe: false` |
 | 5 | **NURSTYLE: real customer questions** | 12–20 entries: question / source channel / touchpoint it belongs to | The current ones are **examples written by me**. Please replace them with real data |
 | 6 | **The real AI search observation** | Test query, the AI's answer (excerpt), and which page was cited | The current `AI_ANSWER` is a **mockup**. It must match what you actually observed |

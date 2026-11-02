@@ -5,7 +5,6 @@ import '@fontsource/noto-sans-tc/600.css';
 import './style.css';
 
 import Lenis from 'lenis';
-import { PROFILE } from './data/content.js';
 import { clamp } from './lib/util.js';
 import { createOpen } from './scenes/open.js';
 import { createNur } from './scenes/nur.js';
@@ -15,13 +14,10 @@ import { createPresenter } from './presenter.js';
 
 history.scrollRestoration = 'manual';
 
-document.getElementById('profileName').textContent = PROFILE.name;
-document.getElementById('profileMeta').textContent = `${PROFILE.place} ${PROFILE.year}`;
-
-const CHAPTERS = ['01 — Opening Gallery', '02 — Interpreter', '03 — From Experience to AI', '04 — Export Compass'];
+const CHAPTERS = ['01 Opening Gallery', '02 Interpreter', '03 From Experience to AI', '04 Export Compass'];
 
 async function boot() {
-  await document.fonts.ready; // layouts measure type, (the 80/20 grid), so wait for fonts
+  await document.fonts.ready; // layouts measure type (the logo hand-off), so wait for fonts
 
   const sections = {
     open: document.getElementById('open'),
@@ -48,34 +44,26 @@ async function boot() {
     return metrics[i].top + clamp(p) * metrics[i].len;
   };
 
-  const chapterLabel = document.getElementById('chapterLabel');
-  const chapterIdx = document.getElementById('chapterIdx');
-  const fill = document.getElementById('progressFill');
-  const hint = document.getElementById('hint');
+  const hudChapter = document.getElementById('hudChapter');
   let chapter = -1;
 
   function frame(force = false) {
     const y = lenis.scroll;
-    let dark = false, ch = 0;
+    let ch = 0;
     scenes.forEach((s, i) => {
       const m = metrics[i];
       const p = clamp((y - m.top) / m.len);
-      // only drive scenes that are on screen (or adjacent)
-      if (y > m.top - innerHeight * 1.2 && y < m.top + m.len + innerHeight * 1.2) s.api.update(p, force);
+      // only drive scenes that are on screen (or adjacent); a forced frame
+      // settles every scene, e.g. the logo when starting mid-presentation
+      if (force || (y > m.top - innerHeight * 1.2 && y < m.top + m.len + innerHeight * 1.2)) s.api.update(p, force);
       if (y >= m.top - innerHeight * 0.5) {
         ch = s.api.chapter(p);
-        dark = s.el.classList.contains('dark');
       }
     });
     if (ch !== chapter) {
       chapter = ch;
-      chapterLabel.textContent = CHAPTERS[ch];
-      chapterIdx.textContent = String(ch + 1).padStart(2, '0');
+      hudChapter.textContent = CHAPTERS[ch]; // chapters are for the presenter only
     }
-    document.body.classList.toggle('is-dark', dark);
-    const max = document.documentElement.scrollHeight - innerHeight;
-    fill.style.transform = `scaleX(${y / max})`;
-    hint.style.opacity = y < 40 ? 1 : 0;
   }
 
   function raf(t) {
