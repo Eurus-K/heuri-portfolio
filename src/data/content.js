@@ -51,6 +51,16 @@ export const QUESTIONS = [
   { q: '抗菌是真的嗎？', src: '評論', to: 'faq' },
 ];
 
+/**
+ * FAQ before / after screenshots for the NURSTYLE card.
+ * Put PNGs in /public/works/ (1440px wide, same browser width for both) and
+ * set the paths; empty = the built-in placeholder screens.
+ */
+export const FAQ_SHOTS = {
+  before: '', // e.g. '/works/faq-before.png'
+  after: '', // e.g. '/works/faq-after.png'
+};
+
 /** The AI-search moment. Keep it truthful to what you actually observed. */
 export const AI_ANSWER = {
   query: '護理師制服推薦哪個品牌？可以先試穿嗎？',

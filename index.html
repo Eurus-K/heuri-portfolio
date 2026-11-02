@@ -39,29 +39,46 @@
         </div>
       </section>
 
-      <!-- ═════════ 02b NURSTYLE — from scattered questions to structure ═════════ -->
-      <section class="scene scene--nur" id="nur" data-chapter="1" style="--len: 650">
+      <!-- ═════════ 02 NURSTYLE — questions → FAQ before/after → cited by AI ═════════ -->
+      <section class="scene scene--nur" id="nur" data-chapter="1" style="--len: 800">
         <div class="stage">
+          <!-- dusk rising: plum → rose → full peach, then back to night -->
+          <div class="sky sky--rose" id="skyRose"></div>
+          <div class="sky sky--peach" id="skyPeach"></div>
+
           <div class="nur__head" id="nurHead">
-            <p class="mono">Case — NURSTYLE · SEO / AEO / GEO</p>
+            <p class="nur__eyebrow">NURSTYLE　SEO · AEO · GEO</p>
             <h2 class="nur__title">從真實顧客問題出發</h2>
-            <p class="nur__en">Start from what customers actually ask.</p>
           </div>
           <div class="nur__field" id="nurField"></div>
-          <div class="nur__cols" id="nurCols"></div>
-          <div class="nur__caption" id="nurCaption">
-            <p class="mono">Decision touchpoints</p>
-            <p class="nur__capzh">把分散在各平台的提問，<br />整理成四個決策接觸點。</p>
-          </div>
-          <div class="ai" id="ai">
-            <div class="ai__bar mono"><span class="ai__dotk"></span>AI Search — test query</div>
-            <p class="ai__q" id="aiQ"></p>
-            <p class="ai__a" id="aiA"></p>
-            <p class="ai__cite mono" id="aiCite"></p>
-          </div>
-          <div class="nur__out" id="nurOut">
-            <p class="nur__outzh">結構清楚的資訊，<br />才會被 AI 引用與推薦。</p>
-            <p class="nur__outen">Structure is what gets cited.</p>
+
+          <!-- the card rises from below (Maze-style) and holds the before/after -->
+          <article class="case" id="caseCard">
+            <nav class="case__tabs" id="caseTabs"></nav>
+            <div class="case__body">
+              <div class="case__text">
+                <h3 class="case__title">FAQ 頁面</h3>
+                <p class="case__desc">把散落在各平台的提問，<br />整理成 AI 讀得懂的結構。</p>
+              </div>
+              <div class="ba" id="ba">
+                <div class="ba__layer ba__after" id="baAfter"></div>
+                <div class="ba__layer ba__before" id="baBefore"></div>
+                <span class="ba__tag ba__tag--before">Before</span>
+                <span class="ba__tag ba__tag--after">After</span>
+                <div class="ba__line" id="baLine"><i class="ba__knob"></i></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- the climax on full peach -->
+          <div class="cited" id="cited">
+            <h2 class="cited__title">結構清楚的資訊，<br />才會被 AI 引用與推薦。</h2>
+            <div class="ai" id="ai">
+              <div class="ai__bar"><span class="ai__dotk"></span>AI 搜尋測試</div>
+              <p class="ai__q" id="aiQ"></p>
+              <p class="ai__a" id="aiA"></p>
+              <p class="ai__cite" id="aiCite"></p>
+            </div>
           </div>
         </div>
       </section>

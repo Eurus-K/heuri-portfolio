@@ -53,9 +53,9 @@ async function boot() {
     scenes.forEach((s, i) => {
       const m = metrics[i];
       const p = clamp((y - m.top) / m.len);
-      // only drive scenes that are on screen (or adjacent); a forced frame
-      // settles every scene, e.g. the logo when starting mid-presentation
-      if (force || (y > m.top - innerHeight * 1.2 && y < m.top + m.len + innerHeight * 1.2)) s.api.update(p, force);
+      // every scene settles every frame (idle ones return early), so jumping
+      // straight to a chapter still leaves e.g. the logo in the right state
+      s.api.update(p, force);
       if (y >= m.top - innerHeight * 0.5) {
         ch = s.api.chapter(p);
       }
