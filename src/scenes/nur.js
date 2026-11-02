@@ -1,12 +1,13 @@
 /**
  * 02 NURSTYLE — real customer questions → FAQ before/after → cited by AI.
  *
- * Three one-scroll moments are triggered (they play whole, and play backwards
- * when scrolling back); the rest is scroll-driven.
+ * Everything follows the scroll (Maze-style) except the drop and the typing.
+ * The credits roll, the line and the card rise each take about one wheel step.
  *
  *  0.00         question pills drop in and pile up            (triggered, physics)
- *  ROLL_AT      the pile rolls away like credits, then the line appears (triggered)
- *  CARD_AT      the case card rises from below over the line  (triggered)
+ *  ROLL         the pile rolls up and away like credits, accelerating
+ *  LINE         the line rises in
+ *  CARD         the case card rises from below over the line
  *  0.12 ─ 0.30  the FAQ page wipes from Before to After
  *  0.30 ─ 0.50  dusk rises behind the card: plum → rose → full peach
  *  0.52 ─ 0.86  on peach: the takeaway, and the AI answer citing the page
@@ -22,8 +23,10 @@ const PILL_COLORS = [
   { color: '#f3ebe1', ink: '#2a1424' }, // cream sand
 ];
 const DROP_LIVE = 0.035; // arriving later than this skips straight to the settled pile
-const ROLL_AT = 0.06; // ~one wheel step after the pile's beat
-const CARD_AT = 0.085; // ~one more wheel step
+// each ~one wheel step of scroll (about 0.025 of this scene)
+const ROLL = [0.045, 0.07];
+const LINE = [0.06, 0.077];
+const CARD = [0.082, 0.107];
 const CITED_AT = [0.56, 0.85]; // AI answer types while p is inside this range
 const Q_MS = 32, A_MS = 18; // per character
 
@@ -74,31 +77,6 @@ export function createNur(root) {
     requestAnimationFrame(loop);
   })(performance.now());
 
-  // ── triggered moments: play forward on entry, backwards on exit ──
-  const moment = (el, frames, opts) => {
-    const anim = el.animate(frames, { fill: 'both', ...opts });
-    anim.pause();
-    anim.currentTime = 0;
-    return (on) => {
-      if (anim.playbackRate !== (on ? 1 : -1)) anim.playbackRate = on ? 1 : -1;
-      anim.play();
-    };
-  };
-  const roll = moment(pileEl, [
-    { transform: 'translateY(0)', opacity: 1 },
-    { transform: 'translateY(-70vh)', opacity: 1, offset: 0.7 },
-    { transform: 'translateY(-130vh)', opacity: 0 },
-  ], { duration: 900, easing: 'cubic-bezier(0.55, 0, 0.7, 0.2)' });
-  const lineIn = moment(lineEl, [
-    { transform: 'translateY(40px)', opacity: 0 },
-    { transform: 'none', opacity: 1 },
-  ], { duration: 800, delay: 550, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
-  const cardUp = moment(cardRise, [
-    { transform: 'translateY(100vh)' },
-    { transform: 'none' },
-  ], { duration: 1300, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
-  const state = { roll: false, card: false };
-
   let last = -1;
   function update(p, force) {
     if (!force && Math.abs(p - last) < 1e-5) return;
@@ -111,10 +89,16 @@ export function createNur(root) {
       p < DROP_LIVE ? pile.start() : pile.settle();
     }
 
-    // one scroll: credits roll + the line; one more: the card rises over it
-    const rollOn = p >= ROLL_AT, cardOn = p >= CARD_AT;
-    if (rollOn !== state.roll) { state.roll = rollOn; roll(rollOn); lineIn(rollOn); }
-    if (cardOn !== state.card) { state.card = cardOn; cardUp(cardOn); }
+    // credits roll: slow off the mark, then fast and gone
+    const roll = range(p, ROLL[0], ROLL[1]);
+    pileEl.style.transform = `translateY(${-ease.in(roll) * 130}vh)`;
+    pileEl.style.opacity = 1 - range(roll, 0.7, 1);
+
+    // the line rises in; the card then rises over it
+    const lin = ease.out(range(p, LINE[0], LINE[1]));
+    fx(lineEl, lin, (1 - lin) * 40);
+    const cin = ease.out(range(p, CARD[0], CARD[1]));
+    cardRise.style.transform = `translateY(${(1 - cin) * 100}vh)`;
 
     // the card holds, then gives way to the peach
     const cout = ease.inOut(range(p, 0.48, 0.53));
