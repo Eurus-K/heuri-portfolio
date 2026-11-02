@@ -23,7 +23,7 @@ import { clamp, lerp, range, ease, rng } from '../lib/util.js';
 import { createOrb } from '../lib/orb.js';
 
 const P = 1000; // CSS perspective (px)
-const TIMELINE_END = 0.875;
+const TIMELINE_END = 0.857; // ~one wheel step after the logo lands, the scene ends
 const STATUS_AT = [0.37, 0.46, 0.55]; // start of each status line
 const STATUS_LEN = 0.09;
 const TYPE_MS = 38; // per character

@@ -113,6 +113,9 @@ body.is-handoff .chrome { opacity: 0; }
 
 /* ─────────────── Scenes ─────────────── */
 .scene { position: relative; height: calc(var(--len) * 1vh); }
+/* NURSTYLE pins exactly as the opening ends: no empty screen to scroll through
+   (the opening's stage is empty by then, so the overlap is invisible) */
+.scene--nur { margin-top: -100vh; }
 .stage { position: sticky; top: 0; height: 100vh; width: 100%; overflow: hidden; }
 
 /* ═════════ 01 OPENING ═════════ */
