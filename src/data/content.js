@@ -23,10 +23,10 @@ export const COMPASS = {
  * NURSTYLE — the decision touchpoints (tabs on the case card).
  */
 export const TOUCHPOINTS = [
-  { id: 'line', en: 'LINE OA', zh: 'LINE 官方帳號' },
-  { id: 'faq', en: 'FAQ', zh: '常見問題' },
-  { id: 'fit', en: 'Try-on', zh: '試穿服務' },
-  { id: 'group', en: 'Group Order', zh: '團體採購' },
+  { id: 'line', label: 'LINE OA' },
+  { id: 'faq', label: 'FAQ' },
+  { id: 'fit', label: '試穿服務' },
+  { id: 'group', label: '團體採購' },
 ];
 
 /**
@@ -57,13 +57,14 @@ export const QUESTIONS = [
 ];
 
 /**
- * FAQ before / after screenshots for the NURSTYLE card.
- * Put PNGs in /public/works/ (1440px wide, same browser width for both) and
- * set the paths; empty = the built-in placeholder screens.
+ * FAQ before / after screenshots for the NURSTYLE card (in /public/works/).
+ * `after` is a full-page capture (GoFullPage expands every answer, which is
+ * what crawlers and AI see); the card scrolls down it after the wipe.
+ * Empty = the built-in placeholder screens.
  */
 export const FAQ_SHOTS = {
-  before: '', // e.g. '/works/faq-before.png'
-  after: '', // e.g. '/works/faq-after.png'
+  before: '/works/faq-before.webp', // old FAQ page, June 2026
+  after: '/works/faq-after-full.webp', // new FAQ page, full-page capture
 };
 
 /** The AI-search moment. Keep it truthful to what you actually observed. */

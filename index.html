@@ -43,6 +43,7 @@
       <section class="scene scene--nur" id="nur" data-chapter="1" style="--len: 600">
         <div class="stage">
           <!-- dusk rising: plum → rose → full peach, then back to night -->
+          <div class="sky sky--flat" id="skyFlat"></div>
           <div class="sky sky--rose" id="skyRose"></div>
           <div class="sky sky--peach" id="skyPeach"></div>
 
@@ -52,22 +53,19 @@
 
           <!-- the card rises from below (Maze-style) and holds the before/after -->
           <div class="case-rise" id="caseRise">
-          <article class="case" id="caseCard">
-            <nav class="case__tabs" id="caseTabs"></nav>
-            <div class="case__body">
-              <div class="case__text">
-                <h3 class="case__title">FAQ 頁面</h3>
-                <p class="case__desc">把散落在各平台的提問，<br />整理成 AI 讀得懂的結構。</p>
-              </div>
-              <div class="ba" id="ba">
-                <div class="ba__layer ba__after" id="baAfter"></div>
-                <div class="ba__layer ba__before" id="baBefore"></div>
-                <span class="ba__tag ba__tag--before">Before</span>
-                <span class="ba__tag ba__tag--after">After</span>
-                <div class="ba__line" id="baLine"><i class="ba__knob"></i></div>
-              </div>
+            <div class="case-col" id="caseCol">
+              <!-- a white frame; the page fills it (Maze-style) -->
+              <article class="case" id="caseCard">
+                <div class="ba" id="ba">
+                  <div class="ba__layer ba__after" id="baAfter"></div>
+                  <div class="ba__layer ba__before" id="baBefore"></div>
+                  <span class="ba__tag ba__tag--before">Before</span>
+                  <span class="ba__tag ba__tag--after">After</span>
+                  <div class="ba__line" id="baLine"><i class="ba__knob"></i></div>
+                </div>
+              </article>
+              <nav class="case__tabs" id="caseTabs"></nav>
             </div>
-          </article>
           </div>
 
           <!-- the climax on full peach -->
