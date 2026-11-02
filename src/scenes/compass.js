@@ -25,8 +25,8 @@ export function createCompass(root) {
   const signWord = $('#signWord');
 
   signWord.textContent = PROFILE.name;
-  $('#signCopy').textContent = `© ${PROFILE.year} ${PROFILE.name}`;
-  $('#signMeta').textContent = `INTERPRETER · ${PROFILE.place}`;
+  $('#signCopy').textContent = `© ${PROFILE.year} ${PROFILE.name} · INTERPRETER · ${PROFILE.place}`;
+  $('#signMeta').textContent = ''; // right side: a contact link, once decided
 
   // the wordmark spans the full width: size it from its measured width
   const fitSign = () => {
