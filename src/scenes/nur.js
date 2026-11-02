@@ -1,14 +1,16 @@
 /**
  * 02 NURSTYLE — real customer questions → FAQ before/after → cited by AI.
  *
- *  0.00 ─ 0.17  question pills drop in and pile up (triggered, physics)
- *  0.18 ─ 0.30  the pile rolls up and away like end credits, faster than the scroll
- *  0.30 ─ 0.46  one line: 從跨市場的品牌溝通，到 AI 時代的資訊轉譯
- *  0.44 ─ 0.53  the case card rises from below (Maze-style)
- *  0.56 ─ 0.68  the FAQ page wipes from Before to After
- *  0.62 ─ 0.78  dusk rises behind the card: plum → rose → full peach
- *  0.78 ─ 0.95  on peach: the takeaway, and the AI answer citing the page
- *  0.92 ─ 1.00  peach sinks back into night, ready for the map
+ * Three one-scroll moments are triggered (they play whole, and play backwards
+ * when scrolling back); the rest is scroll-driven.
+ *
+ *  0.00         question pills drop in and pile up            (triggered, physics)
+ *  ROLL_AT      the pile rolls away like credits, then the line appears (triggered)
+ *  CARD_AT      the case card rises from below over the line  (triggered)
+ *  0.12 ─ 0.30  the FAQ page wipes from Before to After
+ *  0.30 ─ 0.50  dusk rises behind the card: plum → rose → full peach
+ *  0.52 ─ 0.86  on peach: the takeaway, and the AI answer citing the page
+ *  0.84 ─ 0.98  peach sinks back into night, ready for the map
  */
 import { QUESTIONS, TOUCHPOINTS, AI_ANSWER, FAQ_SHOTS } from '../data/content.js';
 import { range, ease, rng, fx } from '../lib/util.js';
@@ -19,8 +21,10 @@ const PILL_COLORS = [
   { color: '#6e7bf2', ink: '#ffffff' }, // periwinkle
   { color: '#f3ebe1', ink: '#2a1424' }, // cream sand
 ];
-const DROP_LIVE = 0.08; // arriving later than this skips straight to the settled pile
-const CITED_AT = [0.81, 0.95]; // AI answer types while p is inside this range
+const DROP_LIVE = 0.035; // arriving later than this skips straight to the settled pile
+const ROLL_AT = 0.06; // ~one wheel step after the pile's beat
+const CARD_AT = 0.085; // ~one more wheel step
+const CITED_AT = [0.56, 0.85]; // AI answer types while p is inside this range
 const Q_MS = 32, A_MS = 18; // per character
 
 export function createNur(root) {
@@ -28,6 +32,7 @@ export function createNur(root) {
   const pileEl = $('#pile');
   const lineEl = $('#nurLine');
   const card = $('#caseCard');
+  const cardRise = $('#caseRise');
   const before = $('#baBefore'), after = $('#baAfter'), line = $('#baLine');
   const tagBefore = $('.ba__tag--before');
   const skyRose = $('#skyRose'), skyPeach = $('#skyPeach');
@@ -47,9 +52,7 @@ export function createNur(root) {
   const r = rng(7);
   const pile = createPile(pileEl, QUESTIONS.map((q) => ({ text: q.q, ...PILL_COLORS[Math.floor(r() * 3)] })));
 
-  let vh = innerHeight;
   function layout() {
-    vh = innerHeight;
     pile.layout();
   }
 
@@ -71,6 +74,31 @@ export function createNur(root) {
     requestAnimationFrame(loop);
   })(performance.now());
 
+  // ── triggered moments: play forward on entry, backwards on exit ──
+  const moment = (el, frames, opts) => {
+    const anim = el.animate(frames, { fill: 'both', ...opts });
+    anim.pause();
+    anim.currentTime = 0;
+    return (on) => {
+      if (anim.playbackRate !== (on ? 1 : -1)) anim.playbackRate = on ? 1 : -1;
+      anim.play();
+    };
+  };
+  const roll = moment(pileEl, [
+    { transform: 'translateY(0)', opacity: 1 },
+    { transform: 'translateY(-70vh)', opacity: 1, offset: 0.7 },
+    { transform: 'translateY(-130vh)', opacity: 0 },
+  ], { duration: 900, easing: 'cubic-bezier(0.55, 0, 0.7, 0.2)' });
+  const lineIn = moment(lineEl, [
+    { transform: 'translateY(40px)', opacity: 0 },
+    { transform: 'none', opacity: 1 },
+  ], { duration: 800, delay: 550, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+  const cardUp = moment(cardRise, [
+    { transform: 'translateY(100vh)' },
+    { transform: 'none' },
+  ], { duration: 1300, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+  const state = { roll: false, card: false };
+
   let last = -1;
   function update(p, force) {
     if (!force && Math.abs(p - last) < 1e-5) return;
@@ -83,41 +111,35 @@ export function createNur(root) {
       p < DROP_LIVE ? pile.start() : pile.settle();
     }
 
-    // end credits: the whole pile rolls up and away, faster than the scroll
-    const roll = ease.in(range(p, 0.18, 0.3));
-    pileEl.style.transform = `translateY(${-roll * vh * 1.3}px)`;
-    pileEl.style.opacity = 1 - range(p, 0.25, 0.3);
+    // one scroll: credits roll + the line; one more: the card rises over it
+    const rollOn = p >= ROLL_AT, cardOn = p >= CARD_AT;
+    if (rollOn !== state.roll) { state.roll = rollOn; roll(rollOn); lineIn(rollOn); }
+    if (cardOn !== state.card) { state.card = cardOn; cardUp(cardOn); }
 
-    // one line
-    const lin = ease.out(range(p, 0.3, 0.35));
-    const lout = ease.inOut(range(p, 0.42, 0.46));
-    fx(lineEl, lin * (1 - lout), (1 - lin) * 40 - lout * 50);
-
-    // the case card rises, holds, then gives way to the peach
-    const cin = ease.out(range(p, 0.44, 0.53));
-    const cout = ease.inOut(range(p, 0.76, 0.8));
-    card.style.opacity = Math.min(1, cin * 2) * (1 - cout);
-    card.style.visibility = cin * (1 - cout) < 0.002 ? 'hidden' : 'visible';
-    card.style.transform = `translate(-50%, -50%) translateY(${(1 - cin) * 70 - cout * 4}vh) scale(${1 - cout * 0.03})`;
+    // the card holds, then gives way to the peach
+    const cout = ease.inOut(range(p, 0.48, 0.53));
+    card.style.opacity = 1 - cout;
+    card.style.visibility = cout > 0.998 ? 'hidden' : 'visible';
+    card.style.transform = `translate(-50%, -50%) translateY(${-cout * 4}vh) scale(${1 - cout * 0.03})`;
 
     // before → after wipe
-    const v = 100 * (1 - ease.inOut(range(p, 0.56, 0.68)));
+    const v = 100 * (1 - ease.inOut(range(p, 0.12, 0.3)));
     before.style.clipPath = `inset(0 ${100 - v}% 0 0)`;
     line.style.left = `${v}%`;
     line.style.opacity = v > 0.5 && v < 99.5 ? 1 : 0;
     tagBefore.style.opacity = range(v, 4, 14); // off once the page is all After
 
     // dusk rising to full peach, then sinking back to night
-    const rose = range(p, 0.62, 0.72) * (1 - range(p, 0.95, 1));
-    const peach = range(p, 0.7, 0.78) * (1 - range(p, 0.92, 0.98));
+    const rose = range(p, 0.3, 0.42) * (1 - range(p, 0.9, 0.98));
+    const peach = range(p, 0.4, 0.5) * (1 - range(p, 0.84, 0.92));
     skyRose.style.opacity = rose;
     skyPeach.style.opacity = peach;
     document.body.classList.toggle('is-light', peach > 0.5);
 
     // climax: takeaway + AI answer
-    const tt = ease.out(range(p, 0.78, 0.82));
-    const ta = ease.out(range(p, 0.8, 0.85));
-    const out = range(p, 0.92, 0.95);
+    const tt = ease.out(range(p, 0.52, 0.57));
+    const ta = ease.out(range(p, 0.55, 0.6));
+    const out = range(p, 0.82, 0.86);
     fx(citedTitle, tt * (1 - out), (1 - tt) * 40);
     fx(ai, ta * (1 - out), (1 - ta) * 50);
     const on = p >= CITED_AT[0] && p < CITED_AT[1];
