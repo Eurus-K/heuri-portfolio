@@ -15,8 +15,8 @@
 const BEATS = [
   { s: 'open', p: 0, dur: 1.2, note: '（不說話）讓作品自己出場：品牌、包裝、平面、AI、音樂封面。' },
   { s: 'open', p: 0.13, dur: 3.4, note: '穿過作品。每一件都在不同市場、不同受眾之間做轉譯。' },
-  { s: 'open', p: 0.25, dur: 2.8, note: '（繼續穿越，作品開始聚向中心）' },
-  { s: 'open', p: 0.36, dur: 2.6, note: '這些作品看起來很分散，但背後是同一種能力——' },
+  { s: 'open', p: 0.25, dur: 2.8, note: '（作品退到畫面四周，繼續漂浮）' },
+  { s: 'open', p: 0.36, dur: 2.6, note: '光球出現，第一批作品被吸進去。這些作品看起來很分散，但背後是同一種能力——' },
   { s: 'open', p: 0.435, dur: 2, note: 'Seeing beyond the surface：看穿表面。' },
   { s: 'open', p: 0.525, dur: 2, note: 'Connecting the dots：把分散的資訊連起來。' },
   { s: 'open', p: 0.615, dur: 2, note: 'Distilling what matters：提煉出真正重要的事。' },

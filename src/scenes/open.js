@@ -1,24 +1,32 @@
 /**
  * 01 OPENING GALLERY → the orb → INTERPRETER → 80/20
  *
- * One pinned stage, one progress value p (0..1). Every frame is a pure
- * function of p, so scrubbing backwards on stage is always safe.
+ * One pinned stage, one progress value p (0..1). Transitions are pure
+ * functions of p, so scrubbing backwards on stage is always safe. Two moments
+ * are triggered instead of scrubbed, so one scroll / one click plays them whole:
+ * the status lines (typed) and INTERPRETER (per-letter entrance, Dipper-style).
  *
  *  0.00 ─ 0.26  GALLERY    camera travels through a 3D field of works; no text
- *  0.23 ─ 0.36  ABSORB     works drift to the centre and dissolve; the orb forms
- *  0.37 ─ 0.63  STATUS     three lines, each with its own orb palette
- *  0.64 ─ 0.72  DIVE       the orb rushes towards the lens and floods the frame
- *  0.71 ─ 0.86  INTERPRETER   alone, comes into focus (blur → sharp, wide → tight)
- *  0.86 ─ 1.00  80/20      100 cells; 20 remain
+ *  0.24 ─ 0.34  PARK       works settle around the edges and keep floating
+ *  0.29 ─ 0.62  ABSORB     the orb forms; each status line pulls in one batch
+ *  0.37 ─ 0.64  STATUS     three lines, each with its own orb palette
+ *  0.645─ 0.69  SHRINK     the orb quietly shrinks away
+ *  0.70 ─ 0.83  INTERPRETER   alone; letters slide in, slide out
+ *  0.855─ 1.00  80/20      100 cells; 20 remain
  */
 import { WORKS, CATEGORIES } from '../data/works.js';
 import { STATUS_LINES } from '../data/content.js';
-import { clamp, lerp, range, ease, rng, fx, typeText } from '../lib/util.js';
+import { clamp, lerp, range, ease, rng, fx } from '../lib/util.js';
 import { createOrb } from '../lib/orb.js';
 
 const P = 1000; // CSS perspective (px)
 const STATUS_AT = [0.37, 0.46, 0.55]; // start of each status line
 const STATUS_LEN = 0.09;
+const TYPE_MS = 38; // per character
+// batch k is absorbed starting here: one while the orb forms, one per status line
+const BATCH_AT = [0.305, ...STATUS_AT.map((a) => a - 0.005)];
+const BATCH_SIZES = [6, 7, 7, 8];
+const WORD_IN = 0.7, WORD_OUT = 0.83;
 
 export function createOpen(root) {
   const $ = (s) => root.querySelector(s);
@@ -35,6 +43,15 @@ export function createOpen(root) {
 
   // ── works ─────────────────────────────────────────────────
   const r = rng(11);
+  const batchOf = [];
+  BATCH_SIZES.forEach((n, k) => { for (let j = 0; j < n; j++) batchOf.push(k); });
+  // deterministic shuffle so each batch mixes disciplines
+  for (let i = batchOf.length - 1; i > 0; i--) {
+    const j = Math.floor(r() * (i + 1));
+    [batchOf[i], batchOf[j]] = [batchOf[j], batchOf[i]];
+  }
+  const inBatch = [0, 0, 0, 0];
+
   const items = WORKS.map((w, i) => {
     const el = document.createElement('div');
     el.className = `work work--${w.cat.toLowerCase()}`;
@@ -47,14 +64,17 @@ export function createOpen(root) {
     if (w.cat === 'MUSIC') el.addEventListener('click', () => toggleMusic(el, w));
 
     const central = i % 4 === 2;
+    const batch = batchOf[i % batchOf.length];
     return {
       w, el, i,
       size: 0.55 + r() * 0.8, // relative area
       theta: i * 2.39996 + 3.88,
       radius: central ? 0.12 + r() * 0.1 : 0.42 + r() * 0.36,
       zJitter: (r() - 0.5) * 160,
-      absorb: r(), // order in which it falls into the orb
-      wpx: 0, hpx: 0, x: 0, y: 0, zBase: 0,
+      settle: r(),
+      batch, inBatch: inBatch[batch]++,
+      phase: r() * Math.PI * 2, // floating drift
+      wpx: 0, hpx: 0, x: 0, y: 0, zBase: 0, px: 0, py: 0, ps: 1,
     };
   });
 
@@ -69,6 +89,17 @@ export function createOpen(root) {
     return { el, k, key: keyCells.has(k), d: r2(), dx: 0, dy: 0 };
   });
 
+  // ── INTERPRETER letters ───────────────────────────────────
+  const letters = [...word.textContent.trim()].map((ch) => {
+    const s = document.createElement('span');
+    s.textContent = ch;
+    s.style.display = 'inline-block';
+    s.style.opacity = 0;
+    return s;
+  });
+  word.textContent = '';
+  letters.forEach((s) => word.appendChild(s));
+
   // ── layout ────────────────────────────────────────────────
   let vw, vh, Cmax, orbSize = 160, cellSize = 10;
   const SPACING = 430;
@@ -78,7 +109,10 @@ export function createOpen(root) {
     vh = innerHeight;
     const base = Math.min(vw, vh * 1.6) * 0.2;
 
-    items.forEach((it) => {
+    // edge slots: an elliptical band around the orb, like Dipper's floating clips
+    const slotR = rng(5);
+    const n = items.length;
+    items.forEach((it, k) => {
       const area = base * base * it.size;
       it.wpx = Math.sqrt(area * it.w.ratio);
       it.hpx = Math.sqrt(area / it.w.ratio);
@@ -94,6 +128,12 @@ export function createOpen(root) {
       it.y = Math.sin(it.theta) * R * 0.52;
       it.zBase = -it.i * SPACING - 300 + it.zJitter;
       it.el._fx = null;
+
+      const a = (k / n) * Math.PI * 2 + (slotR() - 0.5) * 0.25;
+      const band = 0.8 + slotR() * 0.35;
+      it.px = Math.cos(a) * vw * 0.4 * band;
+      it.py = Math.sin(a) * vh * 0.38 * band;
+      it.ps = (Math.min(vw, vh) * (0.09 + slotR() * 0.07)) / Math.max(it.wpx, it.hpx);
     });
     Cmax = (WORKS.length - 1) * SPACING - 900;
 
@@ -124,10 +164,41 @@ export function createOpen(root) {
     mouse.y = e.clientY / innerHeight - 0.5;
   });
 
-  // ── orb render loop (only while visible) ──────────────────
+  // ── triggered moments ─────────────────────────────────────
+  const typing = { k: -1, start: 0 };
+  let wordIn = false;
+
+  function wordEnter() {
+    letters.forEach((s, i) => {
+      s.getAnimations().forEach((a) => a.cancel());
+      s.animate(
+        [{ opacity: 0, transform: 'translateX(0.45em) scale(1.3)' }, { opacity: 1, transform: 'none' }],
+        { duration: 1100, delay: i * 45, easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)', fill: 'both' },
+      );
+    });
+  }
+  function wordExit() {
+    const n = letters.length;
+    letters.forEach((s, i) => {
+      s.getAnimations().forEach((a) => a.cancel());
+      s.animate(
+        [{ opacity: Number(getComputedStyle(s).opacity), transform: 'none' }, { opacity: 0, transform: 'translateX(0.3em) scale(0.5)' }],
+        { duration: 650, delay: (n - 1 - i) * 27, easing: 'cubic-bezier(0.55, 0, 0.675, 0.19)', fill: 'both' },
+      );
+    });
+  }
+
+  // ── per-frame loop: orb shader + typing clock ─────────────
   let orbState = { on: false, stage: 0 };
   (function loop(ms) {
     if (orbState.on) orb.draw(ms / 1000, orbState.stage);
+    if (typing.k >= 0) {
+      const line = STATUS_LINES[typing.k];
+      const n = Math.min(line.length, Math.floor((performance.now() - typing.start) / TYPE_MS));
+      const txt = line.slice(0, n);
+      if (statusText.textContent !== txt) statusText.textContent = txt;
+      dots.classList.toggle('is-on', n >= line.length);
+    }
     requestAnimationFrame(loop);
   })(0);
 
@@ -138,12 +209,14 @@ export function createOpen(root) {
     mouse.sy += (mouse.y - mouse.sy) * 0.06;
     const par = 1 - range(p, 0.22, 0.3);
     world.style.transform = `rotateX(${-mouse.sy * 4 * par}deg) rotateY(${mouse.sx * 6 * par}deg)`;
-    if (!force && Math.abs(p - lastP) < 1e-5) return;
+    const floating = p > 0.23 && p < 0.66; // works drift even when scroll is still
+    if (!force && !floating && Math.abs(p - lastP) < 1e-5) return;
     lastP = p;
 
     document.body.classList.toggle('is-intro', p < 0.855); // the word stands alone
+    const now = performance.now() / 1000;
 
-    // ── GALLERY → ABSORB ──
+    // ── GALLERY → PARK → ABSORB ──
     const pf = range(p, 0, 0.26);
     const cam = -400 + (Cmax + 400) * (pf * 0.8 + ease.inOut(pf) * 0.2);
     vp3d.style.perspectiveOrigin = `${lerp(58, 50, ease.inOut(range(p, 0, 0.1)))}% 50%`;
@@ -153,15 +226,30 @@ export function createOpen(root) {
       let o = fog(z);
       let s = 1;
 
-      const a0 = 0.23 + it.absorb * 0.06;
-      const ta = ease.inOutQuart(range(p, a0, a0 + 0.06));
+      // park around the edges (works already passed re-enter from outside)
+      const s0 = 0.235 + it.settle * 0.03;
+      const tp = ease.inOutQuart(range(p, s0, s0 + 0.07));
+      if (tp > 0) {
+        let x0 = x, y0 = y, z0 = z, o0 = o;
+        if (z > 200) { x0 = it.px * 1.9; y0 = it.py * 1.9; z0 = 0; o0 = 0; }
+        const fl = tp * (1 - range(p, 0.62, 0.66));
+        const dx = Math.sin(now * 0.35 + it.phase) * 12 * fl;
+        const dy = Math.cos(now * 0.28 + it.phase * 1.3) * 14 * fl;
+        x = lerp(x0, it.px, tp) + dx;
+        y = lerp(y0, it.py, tp) + dy;
+        z = lerp(Math.min(z0, 0), 0, tp);
+        s = lerp(1, it.ps, tp);
+        o = lerp(o0, 1, Math.min(1, tp * 1.5));
+      }
+
+      // absorbed into the orb with its batch
+      const a0 = BATCH_AT[it.batch] + it.inBatch * 0.005;
+      const ta = ease.inOutQuart(range(p, a0, a0 + 0.035));
       if (ta > 0) {
-        if (z > 200) o = 0; // already behind the camera
         x = lerp(x, 0, ta);
         y = lerp(y, 0, ta);
-        z = lerp(Math.min(z, 0), 0, ta);
-        s = lerp(1, 0.04, ease.in(ta));
-        o *= 1 - range(ta, 0.7, 1);
+        s = lerp(s, s * 0.06, ease.in(ta));
+        o *= 1 - range(ta, 0.65, 1);
       }
 
       const vis = o > 0.002 && z < P * 0.75;
@@ -179,39 +267,31 @@ export function createOpen(root) {
       }
     }
 
-    // ── ORB ──
-    const grow = ease.out(range(p, 0.27, 0.36));
-    const dive = ease.in(range(p, 0.64, 0.69));
-    const orbO = grow * (1 - range(p, 0.682, 0.72));
-    // palette stage: 0 forming → 1 / 2 / 3 per status line
+    // ── ORB — forms, changes colour per line, then quietly shrinks away ──
+    const grow = ease.out(range(p, 0.29, 0.35));
+    const shrink = ease.inOut(range(p, 0.645, 0.69));
+    const orbO = grow * (1 - range(shrink, 0.6, 1));
     const stage = STATUS_AT.reduce((acc, a) => acc + ease.inOut(range(p, a - 0.01, a + 0.03)), 0);
     orbState = { on: orbO > 0.001, stage };
     canvas.style.opacity = orbO;
-    canvas.style.transform = `translate(-50%, -50%) scale(${lerp(0.25, 1, grow) * (1 + dive * 16)})`;
-    canvas.style.filter = dive > 0.01 ? `blur(${dive * 18}px)` : 'none';
+    canvas.style.transform = `translate(-50%, -50%) scale(${lerp(0.25, 1, grow) * (1 - shrink * 0.94)})`;
 
-    // ── STATUS LINES ──
-    let shown = false;
-    STATUS_AT.forEach((a, k) => {
-      if (p < a || p >= a + STATUS_LEN) return;
-      shown = true;
-      const t = range(p, a, a + 0.035);
-      const out = range(p, a + STATUS_LEN - 0.014, a + STATUS_LEN);
-      const txt = typeText(STATUS_LINES[k], t);
-      if (statusText.textContent !== txt) statusText.textContent = txt;
-      dots.classList.toggle('is-on', t >= 1);
-      statusEl.style.opacity = 1 - out;
-    });
-    if (!shown) statusEl.style.opacity = 0;
+    // ── STATUS LINES — one trigger types the whole line ──
+    let k = -1;
+    STATUS_AT.forEach((a, i) => { if (p >= a && p < a + STATUS_LEN) k = i; });
+    if (k !== typing.k) {
+      typing.k = k;
+      typing.start = performance.now();
+      if (k < 0) { statusText.textContent = ''; dots.classList.remove('is-on'); }
+    }
+    statusEl.style.opacity = k < 0 ? 0 : 1 - range(p, STATUS_AT[k] + STATUS_LEN - 0.014, STATUS_AT[k] + STATUS_LEN);
 
-    // ── INTERPRETER — comes into focus ──
-    const w = range(p, 0.71, 0.775);
-    const wo = range(p, 0.83, 0.86);
-    const we = ease.out(w);
-    word.style.opacity = we * (1 - wo);
-    word.style.filter = w < 1 ? `blur(${(1 - we) * 22}px)` : 'none';
-    word.style.letterSpacing = `${lerp(0.45, -0.025, we)}em`;
-    word.style.transform = `translate(-50%, -50%) scale(${1 - wo * 0.04})`;
+    // ── INTERPRETER — plays whole on entry, leaves on exit (either direction) ──
+    const inside = p >= WORD_IN && p < WORD_OUT;
+    if (inside !== wordIn) {
+      wordIn = inside;
+      inside ? wordEnter() : wordExit();
+    }
 
     // ── 80/20 ──
     const live = p >= 0.855;
@@ -227,8 +307,8 @@ export function createOpen(root) {
       c.el.style.opacity = o;
       c.el.style.transform = `translate(${c.dx * (1 - t)}px, ${c.dy * (1 - t)}px) scale(${t})`;
     }
-    pTextEls.forEach((el, k) => {
-      const t = range(p, 0.925 + k * 0.014, 0.95 + k * 0.014);
+    pTextEls.forEach((el, i) => {
+      const t = range(p, 0.925 + i * 0.014, 0.95 + i * 0.014);
       fx(el, t, (1 - t) * 22);
     });
   }
