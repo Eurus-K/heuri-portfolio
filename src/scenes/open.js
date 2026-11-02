@@ -27,6 +27,9 @@ const TYPE_MS = 38; // per character
 const BATCH_AT = [0.305, ...STATUS_AT.map((a) => a - 0.005)];
 const BATCH_SIZES = [6, 7, 7, 8];
 const WORD_IN = 0.7, WORD_OUT = 0.83;
+const ABSORB_LEN = 0.04; // per work
+const SWIRL = 1.1; // radians turned while spiralling in
+const RIPPLE_S = 1.3; // ripple lifetime (seconds)
 
 export function createOpen(root) {
   const $ = (s) => root.querySelector(s);
@@ -74,6 +77,7 @@ export function createOpen(root) {
       settle: r(),
       batch, inBatch: inBatch[batch]++,
       phase: r() * Math.PI * 2, // floating drift
+      arrived: false,
       wpx: 0, hpx: 0, x: 0, y: 0, zBase: 0, px: 0, py: 0, ps: 1,
     };
   });
@@ -189,9 +193,18 @@ export function createOpen(root) {
   }
 
   // ── per-frame loop: orb shader + typing clock ─────────────
-  let orbState = { on: false, stage: 0 };
+  let orbState = { on: false, stage: 0, speed: 1 };
+  const impacts = []; // { x, y, start } — where works hit the orb
+  let orbClock = 0, lastMs = 0, speed = 1;
   (function loop(ms) {
-    if (orbState.on) orb.draw(ms / 1000, orbState.stage);
+    const dt = Math.min(0.05, (ms - lastMs) / 1000);
+    lastMs = ms;
+    speed += (orbState.speed - speed) * 0.03; // ease towards the target flow speed
+    orbClock += dt * speed;
+    if (orbState.on) {
+      const now = performance.now();
+      orb.draw(orbClock, orbState.stage, impacts.map((m) => [m.x, m.y, (now - m.start) / 1000 / RIPPLE_S]));
+    }
     if (typing.k >= 0) {
       const line = STATUS_LINES[typing.k];
       const n = Math.min(line.length, Math.floor((performance.now() - typing.start) / TYPE_MS));
@@ -215,6 +228,13 @@ export function createOpen(root) {
 
     document.body.classList.toggle('is-intro', p < 0.855); // the word stands alone
     const now = performance.now() / 1000;
+
+    // orb size first: works vanish when they reach its rim
+    const grow = ease.out(range(p, 0.29, 0.35));
+    const shrink = ease.inOut(range(p, 0.645, 0.69));
+    const orbScale = lerp(0.25, 1, grow) * (1 - shrink * 0.94);
+    const orbR = 0.5 * orbSize * orbScale;
+    let absorbed = 0;
 
     // ── GALLERY → PARK → ABSORB ──
     const pf = range(p, 0, 0.26);
@@ -242,18 +262,37 @@ export function createOpen(root) {
         o = lerp(o0, 1, Math.min(1, tp * 1.5));
       }
 
-      // absorbed into the orb with its batch
-      const a0 = BATCH_AT[it.batch] + it.inBatch * 0.005;
-      const ta = ease.inOutQuart(range(p, a0, a0 + 0.035));
+      // absorbed with its batch: spirals in, slow then fast, turns round on
+      // the way, and disappears behind the orb's rim (the orb draws on top)
+      const a0 = BATCH_AT[it.batch] + it.inBatch * 0.006;
+      const ta = range(p, a0, a0 + ABSORB_LEN);
+      let round = 0, arrived = false;
       if (ta > 0) {
-        x = lerp(x, 0, ta);
-        y = lerp(y, 0, ta);
-        s = lerp(s, s * 0.06, ease.in(ta));
-        o *= 1 - range(ta, 0.65, 1);
+        const e = ease.in(ta); // easeInCubic
+        const r0 = Math.hypot(x, y) || 1, ang0 = Math.atan2(y, x);
+        const rr = r0 * (1 - e), ang = ang0 + SWIRL * e;
+        x = Math.cos(ang) * rr;
+        y = Math.sin(ang) * rr;
+        s *= lerp(1, 0.35, e);
+        round = Math.min(1, e * 1.6);
+        arrived = rr < orbR * 0.9;
+        if (arrived) {
+          o = 0;
+          absorbed++;
+          if (!it.arrived) impacts.push({ x: Math.cos(ang), y: -Math.sin(ang), start: performance.now() });
+        }
+      }
+      it.arrived = arrived;
+
+      let clip = '';
+      if (round > 0) {
+        const side = Math.min(it.wpx, it.hpx);
+        const ix = ((it.wpx - side) / 2) * round, iy = ((it.hpx - side) / 2) * round;
+        clip = `inset(${iy.toFixed(1)}px ${ix.toFixed(1)}px round ${lerp(2, side / 2, round).toFixed(1)}px)`;
       }
 
       const vis = o > 0.002 && z < P * 0.75;
-      const key = vis ? `${x | 0}|${y | 0}|${z | 0}|${s.toFixed(4)}|${o.toFixed(3)}` : 'h';
+      const key = vis ? `${x | 0}|${y | 0}|${z | 0}|${s.toFixed(4)}|${o.toFixed(3)}|${clip}` : 'h';
       if (it.el._fx !== key) {
         it.el._fx = key;
         if (!vis) {
@@ -263,18 +302,20 @@ export function createOpen(root) {
           it.el.style.opacity = o;
           it.el.style.transform = `translate3d(${x}px, ${y}px, ${z}px) scale(${s})`;
           it.el.style.zIndex = Math.round(z + 10000);
+          it.el.style.clipPath = clip;
         }
       }
     }
+    while (impacts.length && (performance.now() - impacts[0].start) / 1000 > RIPPLE_S) impacts.shift();
+    if (impacts.length > 8) impacts.splice(0, impacts.length - 8);
 
-    // ── ORB — forms, changes colour per line, then quietly shrinks away ──
-    const grow = ease.out(range(p, 0.29, 0.35));
-    const shrink = ease.inOut(range(p, 0.645, 0.69));
+    // ── ORB — forms, changes colour per line, flows faster the more it has
+    //    absorbed, then quietly shrinks away ──
     const orbO = grow * (1 - range(shrink, 0.6, 1));
     const stage = STATUS_AT.reduce((acc, a) => acc + ease.inOut(range(p, a - 0.01, a + 0.03)), 0);
-    orbState = { on: orbO > 0.001, stage };
+    orbState = { on: orbO > 0.001, stage, speed: 1 + (absorbed / items.length) * 1.8 };
     canvas.style.opacity = orbO;
-    canvas.style.transform = `translate(-50%, -50%) scale(${lerp(0.25, 1, grow) * (1 - shrink * 0.94)})`;
+    canvas.style.transform = `translate(-50%, -50%) scale(${orbScale})`;
 
     // ── STATUS LINES — one trigger types the whole line ──
     let k = -1;

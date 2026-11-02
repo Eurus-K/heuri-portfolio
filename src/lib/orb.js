@@ -1,7 +1,9 @@
 /**
  * The orb — a fixed-size glass sphere whose inner colour keeps flowing.
- * Size never pulses; only the colour field moves. Each narrative stage has its
- * own palette (like Dipper), and `stage` blends between them continuously.
+ * Size never pulses; only the colour field moves, faster as it absorbs more,
+ * and works landing on it send a faint ripple across the surface. Each
+ * narrative stage has its own palette (like Dipper), and `stage` blends
+ * between them continuously.
  */
 
 // [deep, mid, light, pale] per stage, linear RGB-ish 0..1
@@ -21,6 +23,7 @@ const FS = `precision highp float;
 varying vec2 v;
 uniform float t;
 uniform vec3 c0, c1, c2, c3;
+uniform vec3 imp[8]; // impacts: xy = direction on the rim, z = age 0..1 (>=1 = off)
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
   return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
@@ -37,6 +40,13 @@ void main(){
   col=mix(col,c3,smoothstep(.55,0.,r)*smoothstep(.3,.7,a)*.6);
   float ang=atan(uv.y,uv.x);
   col=mix(col,c0,smoothstep(.5,1.,r)*(.65+.35*sin(ang*2.+t*.5))*.75);
+  float rip=0.;
+  for(int k=0;k<8;k++){
+    vec3 m=imp[k];
+    if(m.z<1.){ float d=length(uv-m.xy); float R=m.z*1.15; float f=1.-m.z;
+      rip+=exp(-pow((d-R)/.07,2.))*f*f; }
+  }
+  col=mix(col,c3,clamp(rip,0.,1.)*.5);
   if(r>1.){float g=1.-smoothstep(1.,1.19,r);gl_FragColor=vec4(c0,g*g*.4);return;}
   gl_FragColor=vec4(col,1.-smoothstep(.985,1.,r));
 }`;
@@ -64,6 +74,8 @@ export function createOrb(canvas) {
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   const ut = gl.getUniformLocation(pr, 't');
   const uc = [0, 1, 2, 3].map((i) => gl.getUniformLocation(pr, 'c' + i));
+  const uImp = gl.getUniformLocation(pr, 'imp');
+  const impBuf = new Float32Array(24);
 
   function resize(cssSize) {
     const dpr = Math.min(2, devicePixelRatio || 1);
@@ -71,8 +83,11 @@ export function createOrb(canvas) {
     canvas.width = canvas.height = Math.round(cssSize * dpr);
   }
 
-  /** stage: 0..ORB_PALETTES.length-1, fractional values blend */
-  function draw(timeSec, stage) {
+  /**
+   * stage: 0..ORB_PALETTES.length-1, fractional values blend
+   * impacts: up to 8 [x, y, age] — x/y a unit direction on the rim, age 0..1
+   */
+  function draw(timeSec, stage, impacts = []) {
     const max = ORB_PALETTES.length - 1;
     const s = Math.min(max, Math.max(0, stage));
     const i = Math.min(max - 1, Math.floor(s)), f = s - i;
@@ -82,6 +97,12 @@ export function createOrb(canvas) {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform1f(ut, timeSec);
     uc.forEach((u, k) => gl.uniform3f(u, ...A[k].map((x, j) => x + (B[k][j] - x) * f)));
+    impBuf.fill(0);
+    for (let k = 0; k < 8; k++) {
+      const m = impacts[impacts.length - 1 - k];
+      impBuf.set(m ? m : [0, 0, 2], k * 3);
+    }
+    gl.uniform3fv(uImp, impBuf);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
