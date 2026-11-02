@@ -12,7 +12,7 @@
  *  0.29 ─ 0.42  the After page scrolls down: every question AI can read
  *  0.44 ─ 0.51  the card scrolls up and away; the results rise (still flat night)
  *  0.46 ─ 0.60  title, three numbers, the AI answer (types itself), the test note
- *  0.86 ─ 0.98  flat night fades back into the dusk gradient for the map
+ *  last screen  the results scroll up with the page as the map slides in (same flat night)
  *  (the rose → peach climax layers are kept in the markup, unused for now)
  */
 import { QUESTIONS, TOUCHPOINTS, AI_ANSWER, FAQ_SHOTS, RESULTS } from '../data/content.js';
@@ -31,7 +31,7 @@ const LINE = [0.06, 0.077];
 const CARD = [0.082, 0.107];
 const AFTER_SCROLL = [0.29, 0.42];
 const AFTER_END = 0.875; // where the questions end on the full-page capture (the footer starts below)
-const CITED_AT = [0.55, 0.88]; // AI answer types while p is inside this range
+const CITED_AT = [0.55, 1.01]; // AI answer types from here on (stays typed while it scrolls away)
 const Q_MS = 32, A_MS = 18; // per character
 
 export function createNur(root) {
@@ -136,7 +136,7 @@ export function createNur(root) {
     const cin = ease.out(range(p, CARD[0], CARD[1]));
     cardRise.style.transform = `translateY(${(1 - cin) * 100}vh)`;
     // the card section sits on flat night (Maze-style: plain ground, plain card)
-    skyFlat.style.opacity = cin * (1 - range(p, 0.86, 0.94));
+    skyFlat.style.opacity = cin; // stays: the map section continues on the same flat night
 
     // the card holds, then scrolls up and away like a page (Maze-style)
     const cout = ease.in(range(p, 0.44, 0.5));
@@ -160,12 +160,14 @@ export function createNur(root) {
     // keep what is visible centred: items not yet revealed don't count yet
     if (!revealH[1]) measureResults();
     const pending = (1 - ts) * revealH[0] + (1 - ta) * revealH[1] + (1 - tn) * revealH[2];
-    cited.style.transform = `translateY(${pending / 2}px)`;
-    const out = range(p, 0.85, 0.88);
-    fx(resHead, tt * (1 - out), (1 - tt) * 60 - out * 40);
-    fx(resStats, ts * (1 - out), (1 - ts) * 60 - out * 40);
-    fx(ai, ta * (1 - out), (1 - ta) * 60 - out * 40);
-    fx(resNote, tn * (1 - out), (1 - tn) * 30 - out * 40);
+    // the last screen is shared with the map, which slides up from below:
+    // the results scroll up with the page, so it reads as one continuous scroll
+    const exit = range(p, 1 - innerHeight / Math.max(1, root.offsetHeight - innerHeight), 1);
+    cited.style.transform = `translateY(${pending / 2 - exit * innerHeight}px)`;
+    fx(resHead, tt, (1 - tt) * 60);
+    fx(resStats, ts, (1 - ts) * 60);
+    fx(ai, ta, (1 - ta) * 60);
+    fx(resNote, tn, (1 - tn) * 30);
     const on = p >= CITED_AT[0] && p < CITED_AT[1];
     if (on !== typing.on) {
       typing.on = on;
