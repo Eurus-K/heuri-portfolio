@@ -14,14 +14,13 @@
  */
 const BEATS = [
   { s: 'open', p: 0, dur: 1.2, note: '（不說話）讓作品自己出場：品牌、包裝、平面、AI、音樂封面。' },
-  { s: 'open', p: 0.13, dur: 3.4, note: '穿過作品。每一件都在不同市場、不同受眾之間做轉譯。' },
-  { s: 'open', p: 0.25, dur: 2.8, note: '（作品退到畫面四周，繼續漂浮）' },
-  { s: 'open', p: 0.36, dur: 2.6, note: '光球出現，第一批作品被吸進去。這些作品看起來很分散，但背後是同一種能力——' },
-  { s: 'open', p: 0.435, dur: 2, note: 'Seeing beyond the surface：看穿表面。' },
-  { s: 'open', p: 0.525, dur: 2, note: 'Connecting the dots：把分散的資訊連起來。' },
-  { s: 'open', p: 0.615, dur: 2, note: 'Distilling what matters：提煉出真正重要的事。' },
-  { s: 'open', p: 0.8, dur: 3.4, note: 'INTERPRETER：把複雜轉譯成可執行的策略。' },
-  { s: 'open', p: 0.975, dur: 2.6, note: '80/20：從複雜問題中，找出最值得投入的切入點。' },
+  { s: 'open', p: 0.149, dur: 3.4, note: '穿過作品。每一件都在不同市場、不同受眾之間做轉譯。' },
+  { s: 'open', p: 0.286, dur: 2.8, note: '（作品退到畫面四周，繼續漂浮）' },
+  { s: 'open', p: 0.411, dur: 2.6, note: '光球出現，第一批作品被吸進去。這些作品看起來很分散，但背後是同一種能力——' },
+  { s: 'open', p: 0.497, dur: 2, note: 'Seeing beyond the surface：看穿表面。' },
+  { s: 'open', p: 0.6, dur: 2, note: 'Connecting the dots：把分散的資訊連起來。' },
+  { s: 'open', p: 0.703, dur: 2, note: 'Distilling what matters：提煉出真正重要的事。' },
+  { s: 'open', p: 0.891, dur: 3.4, note: 'INTERPRETER：把複雜轉譯成可執行的策略。' },
   { s: 'nur', p: 0.28, dur: 2.6, note: 'NURSTYLE：從真實顧客問題出發，散落在 IG、LINE、評論、Email。' },
   { s: 'nur', p: 0.5, dur: 2.2, note: '重新整理成四個決策接觸點：LINE OA、FAQ、試穿服務、團體採購。' },
   { s: 'nur', p: 0.8, dur: 3, note: '後續 AI 搜尋測試：品牌頁面被引用與推薦。' },
@@ -33,7 +32,7 @@ const BEATS = [
   { s: 'compass', p: 0.75, dur: 3.4, note: '從自然語言描述產品 → 定價、通路與買方、法規路徑、同業借鏡。' },
   { s: 'compass', p: 1, dur: 2, note: '進入 Demo。' },
 ];
-const CHAPTER_BEAT = [0, 7, 13, 16];
+const CHAPTER_BEAT = [0, 7, 12, 15];
 
 export function createPresenter({ lenis, yFor }) {
   const hud = document.getElementById('hud');

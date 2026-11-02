@@ -1,5 +1,5 @@
 /**
- * 01 OPENING GALLERY → the orb → INTERPRETER → 80/20
+ * 01 OPENING GALLERY → the orb → INTERPRETER
  *
  * One pinned stage, one progress value p (0..1). Transitions are pure
  * functions of p, so scrubbing backwards on stage is always safe. Two moments
@@ -13,14 +13,17 @@
  *  0.645─ 0.69  SHRINK     the orb quietly shrinks away
  *  0.70 ─ 0.79  INTERPRETER   alone; letters slide in (and out, scrolling back)
  *  0.79 ─ 0.845 LOGO       the word glides up and becomes the top-centre logo
- *  0.86 ─ 1.00  80/20      number and one Chinese line rise from below
+ *
+ * The timeline is authored on 0..TIMELINE_END; the scene's scroll progress
+ * (0..1) is scaled onto it, so the scene ends shortly after the logo lands.
  */
 import { WORKS, CATEGORIES } from '../data/works.js';
 import { STATUS_LINES } from '../data/content.js';
-import { clamp, lerp, range, ease, rng, fx } from '../lib/util.js';
+import { clamp, lerp, range, ease, rng } from '../lib/util.js';
 import { createOrb } from '../lib/orb.js';
 
 const P = 1000; // CSS perspective (px)
+const TIMELINE_END = 0.875;
 const STATUS_AT = [0.37, 0.46, 0.55]; // start of each status line
 const STATUS_LEN = 0.09;
 const TYPE_MS = 38; // per character
@@ -29,7 +32,7 @@ const BATCH_AT = [0.305, ...STATUS_AT.map((a) => a - 0.005)];
 const BATCH_SIZES = [6, 7, 7, 8];
 const WORD_IN = 0.7;
 const LOGO_AT = [0.79, 0.845]; // INTERPRETER → logo glide
-const ABSORB_LEN = 0.04; // per work
+const ABSORB_LEN = 0.035; // per work
 const SWIRL = 1.1; // radians turned while spiralling in
 const RIPPLE_S = 1.3; // ripple lifetime (seconds)
 
@@ -43,8 +46,6 @@ export function createOpen(root) {
   const dots = $('#orbDots');
   const word = $('#interp');
   const logo = document.getElementById('logo');
-  const pNum = $('.pareto__num');
-  const pZh = $('.pareto__zh');
   const orb = createOrb(canvas);
 
   // ── works ─────────────────────────────────────────────────
@@ -62,7 +63,7 @@ export function createOpen(root) {
     const el = document.createElement('div');
     el.className = `work work--${w.cat.toLowerCase()}`;
     el.style.setProperty('--tone', w.tone);
-    el.style.setProperty('--ph-ink', isLight(w.tone) ? '#1d1d1f' : '#f5f5f7');
+    el.style.setProperty('--ph-ink', isLight(w.tone) ? '#2a1424' : '#fff6ee');
     el.innerHTML = `
       <div class="work__media">${media(w, i)}</div>
       ${w.cat === 'MUSIC' ? '<span class="work__disc"></span>' : ''}`;
@@ -136,7 +137,7 @@ export function createOpen(root) {
 
     // Dipper-scale orb: ~10% of the width, never taller than a quarter screen
     orbSize = Math.round(Math.min(vw * 0.105, vh * 0.24));
-    orb.resize(orbSize * 1.2); // canvas includes room for the outer glow
+    orb.resize(orbSize * 1.7); // canvas includes room for the soft halo
     statusEl.style.setProperty('--status-y', orbSize * 0.5 + Math.max(24, vh * 0.035) + 'px');
 
     // the logo's position and size, so the word can land exactly on it
@@ -201,7 +202,8 @@ export function createOpen(root) {
 
   let lastP = -1;
 
-  function update(p, force = false) {
+  function update(raw, force = false) {
+    const p = raw * TIMELINE_END;
     mouse.sx += (mouse.x - mouse.sx) * 0.06;
     mouse.sy += (mouse.y - mouse.sy) * 0.06;
     const par = 1 - range(p, 0.22, 0.3);
@@ -247,7 +249,7 @@ export function createOpen(root) {
 
       // absorbed with its batch: spirals in, slow then fast, turns round on
       // the way, and disappears behind the orb's rim (the orb draws on top)
-      const a0 = BATCH_AT[it.batch] + it.inBatch * 0.006;
+      const a0 = BATCH_AT[it.batch] + it.inBatch * 0.004; // a batch lands before its beat
       const ta = range(p, a0, a0 + ABSORB_LEN);
       let round = 0, arrived = false;
       if (ta > 0) {
@@ -323,19 +325,13 @@ export function createOpen(root) {
     word.style.transform = `translate(-50%, -50%) translateY(${toLogo.dy * g}px) scale(${lerp(1, toLogo.k, g)})`;
     word.style.visibility = landed ? 'hidden' : 'visible';
     logo.style.opacity = landed ? 1 : 0;
-
-    // ── 80/20 — rises from below, scroll-driven ──
-    const tn = ease.out(range(p, 0.86, 0.91));
-    const tz = ease.out(range(p, 0.885, 0.935));
-    fx(pNum, tn, (1 - tn) * 90);
-    fx(pZh, tz, (1 - tz) * 60);
   }
 
   layout();
   return {
     layout: () => { layout(); update(lastP < 0 ? 0 : lastP, true); },
     update,
-    chapter: (p) => (p < 0.7 ? 0 : 1),
+    chapter: (raw) => (raw * TIMELINE_END < 0.7 ? 0 : 1),
   };
 }
 

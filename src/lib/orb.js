@@ -1,21 +1,21 @@
 /**
- * The orb — a fixed-size glass sphere whose inner colour keeps flowing.
+ * The orb — a fixed-size, softly glowing sphere whose inner colour keeps flowing.
  * Size never pulses; only the colour field moves, faster as it absorbs more,
  * and works landing on it send a faint ripple across the surface. Each
  * narrative stage has its own palette (like Dipper), and `stage` blends
  * between them continuously.
  */
 
-// [deep, mid, light, pale] per stage, linear RGB-ish 0..1
+// [deep, mid, light, pale] per stage, RGB 0..1 — cool to warm, like dusk
 export const ORB_PALETTES = [
-  // 0 — forming: works dissolving in
-  [[0.16, 0.3, 0.98], [0.3, 0.72, 0.98], [0.74, 0.74, 1.0], [0.88, 0.94, 1.0]],
-  // 1 — Seeing beyond the surface: clear cyan, shallow water
-  [[0.03, 0.42, 0.86], [0.3, 0.84, 0.96], [0.66, 0.92, 0.96], [0.92, 0.99, 1.0]],
-  // 2 — Connecting the dots: blue-violet, more threads
-  [[0.29, 0.22, 0.96], [0.45, 0.52, 1.0], [0.78, 0.7, 1.0], [0.94, 0.9, 1.0]],
-  // 3 — Distilling what matters: saturated electric blue, bright core
-  [[0.0, 0.2, 1.0], [0.12, 0.48, 1.0], [0.55, 0.76, 1.0], [0.97, 0.98, 1.0]],
+  // 0 — forming: works dissolving in, lavender mixed with blush
+  [[0.55, 0.45, 0.85], [0.8, 0.66, 0.95], [0.93, 0.84, 0.97], [1.0, 0.97, 0.98]],
+  // 1 — Seeing beyond the surface: lavender, calm observation
+  [[0.42, 0.4, 0.84], [0.64, 0.66, 0.97], [0.85, 0.8, 0.98], [1.0, 0.97, 0.99]],
+  // 2 — Connecting the dots: rose, things start to connect
+  [[0.76, 0.34, 0.6], [0.93, 0.58, 0.76], [0.98, 0.8, 0.87], [1.0, 0.96, 0.95]],
+  // 3 — Distilling what matters: peach, a warm, clear answer
+  [[0.92, 0.44, 0.4], [1.0, 0.66, 0.52], [1.0, 0.84, 0.7], [1.0, 0.98, 0.93]],
 ];
 
 const VS = 'attribute vec2 p;varying vec2 v;void main(){v=p;gl_Position=vec4(p,0.,1.);}';
@@ -30,16 +30,13 @@ float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
 float fbm(vec2 p){return .55*n(p)+.3*n(p*2.1+3.1)+.15*n(p*4.3+7.7);}
 mat2 rot(float a){float s=sin(a),c=cos(a);return mat2(c,-s,s,c);}
 void main(){
-  vec2 uv=v/0.84; float r=length(uv);
-  if(r>1.19){gl_FragColor=vec4(0.);return;}
-  vec2 q=rot(t*.18)*uv*1.3;
-  float a=fbm(q+vec2(t*.09,-t*.06));
-  float b=fbm(rot(-t*.13)*uv*1.1+vec2(5.,t*.07));
+  vec2 uv=v/0.6; float r=length(uv); // sphere radius = 0.6 of the canvas; the rest is glow
+  vec2 q=rot(t*.16)*uv*1.2;
+  float a=fbm(q+vec2(t*.08,-t*.05));
+  float b=fbm(rot(-t*.11)*uv*1.+vec2(5.,t*.06));
   vec3 col=mix(c2,c1,smoothstep(.35,.75,a));
-  col=mix(col,c0,smoothstep(.5,.85,b)*.85);
-  col=mix(col,c3,smoothstep(.55,0.,r)*smoothstep(.3,.7,a)*.6);
-  float ang=atan(uv.y,uv.x);
-  col=mix(col,c0,smoothstep(.5,1.,r)*(.65+.35*sin(ang*2.+t*.5))*.75);
+  col=mix(col,c0,smoothstep(.55,.9,b)*.7);
+  col=mix(col,c3,smoothstep(.75,0.,r)*.75); // bright, milky core
   float rip=0.;
   for(int k=0;k<8;k++){
     vec3 m=imp[k];
@@ -47,8 +44,10 @@ void main(){
       rip+=exp(-pow((d-R)/.07,2.))*f*f; }
   }
   col=mix(col,c3,clamp(rip,0.,1.)*.5);
-  if(r>1.){float g=1.-smoothstep(1.,1.19,r);gl_FragColor=vec4(c0,g*g*.4);return;}
-  gl_FragColor=vec4(col,1.-smoothstep(.985,1.,r));
+  // fluffy: the body melts into a soft halo instead of a hard rim
+  float body=1.-smoothstep(.82,1.08,r);
+  float halo=exp(-pow(max(r-.85,0.)/.28,2.))*.55;
+  gl_FragColor=vec4(mix(c1,col,body),max(body,halo));
 }`;
 
 export function createOrb(canvas) {
