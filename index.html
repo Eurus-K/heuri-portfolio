@@ -1,43 +1,188 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HEURI | Portfolio</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      background: #f5f4f0;
-      color: #252525;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-    h1 {
-      font-size: clamp(64px, 12vw, 120px);
-      letter-spacing: -0.07em;
-      margin: 0 0 20px;
-    }
-    p { line-height: 1.8; }
-    .label {
-      font-size: 12px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-    }
-  </style>
-</head>
-<body>
-  <main>
-    <p class="label">Selected Works & Experience</p>
-    <h1>HEURI</h1>
-    <p>從消費者需求到搜尋策略，<br>
-       協助企業建立清楚、可信且容易被找到的品牌資訊。</p>
-    <p class="label">Portfolio · Coming Soon</p>
-  </main>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>INTERPRETER.</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='5' y='5' width='6' height='6' fill='%23111'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <!-- ───────────── Fixed chrome ───────────── -->
+    <header class="chrome" id="chrome">
+      <div class="chrome__tl">
+        <span class="mark">INTERPRETER<i class="sq"></i></span>
+        <span class="chrome__chapter mono" id="chapterLabel">00 — Opening Gallery</span>
+      </div>
+      <div class="chrome__tr mono">
+        <span id="profileName"></span>
+        <span class="dim" id="profileMeta"></span>
+      </div>
+      <div class="chrome__bl mono" id="hint">Scroll&nbsp;/&nbsp;→ to begin</div>
+      <div class="chrome__br mono"><span id="chapterIdx">01</span><span class="dim">&nbsp;/&nbsp;04</span></div>
+      <div class="progress" id="progress">
+        <div class="progress__fill" id="progressFill"></div>
+      </div>
+    </header>
+
+    <!-- Presenter HUD (press P) -->
+    <aside class="hud mono" id="hud" hidden>
+      <div class="hud__row"><span>BEAT</span><b id="hudBeat">1/1</b></div>
+      <div class="hud__row"><span>TIME</span><b id="hudTime">0:00</b></div>
+      <div class="hud__note" id="hudNote"></div>
+      <div class="hud__keys">→ / Space / PgDn next · ← / PgUp prev · 1–4 chapter · T reset timer · F fullscreen · P hide</div>
+    </aside>
+
+    <main id="scroller">
+      <!-- ═════════ 01 OPENING GALLERY → INTERPRETER. → 80/20 ═════════ -->
+      <section class="scene scene--open" id="open" data-chapter="0" style="--len: 1100">
+        <div class="stage">
+          <div class="intro" id="intro">
+            <p class="mono intro__kicker">A digital exhibition in four rooms</p>
+            <h1 class="intro__title">
+              <span class="line"><span>Works,</span></span>
+              <span class="line"><span><em>interpreted.</em></span></span>
+            </h1>
+            <p class="intro__zh">品牌視覺・包裝・平面・AI 創作・音樂封面</p>
+          </div>
+
+          <div class="viewport3d" id="viewport3d">
+            <div class="world" id="world"></div>
+          </div>
+
+          <!-- Focus bracket (follows the current piece) -->
+          <div class="bracket" id="bracket"><i></i><i></i><i></i><i></i></div>
+          <div class="caption mono" id="caption">
+            <div class="caption__l"><span class="dim" id="capIdx">01/28</span><b id="capTitle"></b></div>
+            <div class="caption__r"><span class="dim" id="capYear"></span><b id="capCat"></b></div>
+          </div>
+
+          <div class="sheetlabel mono" id="sheetLabel">
+            <span>Contact sheet — 28 works, 5 disciplines</span>
+            <span class="dim">Sorted by discipline</span>
+          </div>
+
+          <!-- 02 INTERPRETER. -->
+          <div class="interp" id="interp">
+            <h2 class="interp__word" id="interpWord" aria-label="INTERPRETER.">
+              <span class="interp__letters" id="interpLetters"></span><span class="interp__dot" id="interpDot"></span>
+            </h2>
+            <div class="interp__sub">
+              <p class="mono">02 — The common thread</p>
+              <p class="interp__zh">把複雜的市場、消費者語言與品牌價值，<br />轉譯成可執行的策略。</p>
+              <p class="interp__en"><em>Translating complexity into strategy that can be acted on.</em></p>
+            </div>
+          </div>
+
+          <!-- 80/20 -->
+          <div class="pareto" id="pareto">
+            <div class="pareto__grid" id="paretoGrid"></div>
+            <div class="pareto__text">
+              <p class="pareto__num"><span>80</span><i>/</i><span>20</span></p>
+              <p class="pareto__zh">從複雜的問題中，<br />找出最值得投入的切入點。</p>
+              <p class="pareto__en mono">Find the 20% that moves the other 80%.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════ 02b NURSTYLE — from scattered questions to structure ═════════ -->
+      <section class="scene scene--nur" id="nur" data-chapter="1" style="--len: 650">
+        <div class="stage">
+          <div class="nur__head" id="nurHead">
+            <p class="mono">Case — NURSTYLE · SEO / AEO / GEO</p>
+            <h2 class="nur__title">從真實顧客問題出發</h2>
+            <p class="nur__en"><em>Start from what customers actually ask.</em></p>
+          </div>
+          <div class="nur__field" id="nurField"></div>
+          <div class="nur__cols" id="nurCols"></div>
+          <div class="nur__caption" id="nurCaption">
+            <p class="mono">Decision touchpoints</p>
+            <p class="nur__capzh">把分散在各平台的提問，<br />整理成四個決策接觸點。</p>
+          </div>
+          <div class="ai" id="ai">
+            <div class="ai__bar mono"><span class="ai__dotk"></span>AI Search — test query</div>
+            <p class="ai__q" id="aiQ"></p>
+            <p class="ai__a" id="aiA"></p>
+            <p class="ai__cite mono" id="aiCite"></p>
+          </div>
+          <div class="nur__out" id="nurOut">
+            <p class="nur__outzh">結構清楚的資訊，<br />才會被 AI 引用與推薦。</p>
+            <p class="mono dim">Structure is what gets cited.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════ 03 FROM EXPERIENCE TO AI — World map ═════════ -->
+      <section class="scene scene--map dark" id="map" data-chapter="2" style="--len: 700">
+        <div class="stage">
+          <svg class="map__svg" id="mapSvg" aria-hidden="true"></svg>
+          <div class="map__labels" id="mapLabels"></div>
+
+          <div class="map__head" id="mapHead">
+            <p class="mono">03 — From experience to AI</p>
+            <p class="map__kicker">餐飲業的第二曲線</p>
+            <h2 class="map__title">台灣餐飲出海 <span class="accent">2.0</span></h2>
+          </div>
+
+          <div class="shift" id="shift">
+            <div class="shift__row shift__row--old">
+              <span class="mono dim">1.0</span><span class="shift__item"><s>輸出餐飲服務</s><em>Service</em></span>
+            </div>
+            <div class="shift__row shift__row--new">
+              <span class="mono accent">2.0</span>
+              <span class="shift__item">產品<em>Product</em></span>
+              <span class="shift__item">風味<em>Flavour</em></span>
+              <span class="shift__item">文化價值<em>Culture</em></span>
+            </div>
+          </div>
+
+          <div class="question" id="question">
+            <p class="mono dim">The question</p>
+            <p class="question__zh">如果品牌還沒有 <span class="accent">Global BD</span> 團隊，<br />該如何降低海外市場探索的成本？</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════ 04 EXPORT COMPASS ═════════ -->
+      <section class="scene scene--compass dark" id="compass" data-chapter="3" style="--len: 450">
+        <div class="stage">
+          <div class="cmp__head" id="cmpHead">
+            <p class="mono">04 — Working prototype</p>
+            <h2 class="cmp__title">EXPORT<br />COMPASS<i class="sq"></i></h2>
+            <p class="cmp__zh">AI 市場探索工作台</p>
+          </div>
+          <svg class="cmp__rose" id="cmpRose" viewBox="-100 -100 200 200" aria-hidden="true">
+            <circle r="96" />
+            <circle r="60" class="thin" />
+            <g id="roseTicks"></g>
+            <path id="roseNeedle" d="M0 -84 L5 0 L0 10 L-5 0 Z" />
+          </svg>
+
+          <div class="window" id="window">
+            <div class="window__bar mono">
+              <span class="window__dots"><i></i><i></i><i></i></span>
+              <span>export-compass</span>
+              <span class="dim" id="windowUrl">demo</span>
+            </div>
+            <div class="window__body" id="windowBody">
+              <div class="preview">
+                <p class="mono dim">01 — Describe your product</p>
+                <p class="preview__input" id="previewInput"></p>
+                <div class="preview__mods" id="previewMods">
+                  <div class="mod"><span class="mono">A</span><b>定價</b><em>Pricing</em></div>
+                  <div class="mod"><span class="mono">B</span><b>通路與買方</b><em>Channels &amp; buyers</em></div>
+                  <div class="mod"><span class="mono">C</span><b>法規路徑</b><em>Regulatory path</em></div>
+                  <div class="mod"><span class="mono">D</span><b>同業借鏡</b><em>Peer cases</em></div>
+                </div>
+                <p class="preview__out mono" id="previewOut">→ A market-entry plan you can go and validate.</p>
+              </div>
+            </div>
+          </div>
+          <a class="enter mono" id="enterDemo" href="#" role="button">Enter demo ↗</a>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>
