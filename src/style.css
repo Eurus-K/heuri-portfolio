@@ -213,32 +213,35 @@ body.is-handoff .chrome { opacity: 0; }
 .sky--peach { background: radial-gradient(120% 90% at 50% 10%, #ffd9c4 0%, #ffc9ae 55%, #f5ad9b 100%); }
 body.is-light .logo { color: var(--sheet-ink); }
 
-.nur__head {
-  position: absolute; left: 0; right: 0; top: 50%;
-  transform: translateY(-50%);
-  text-align: center; z-index: 3;
-  opacity: 0;
-}
-.nur__eyebrow { font-size: var(--t-label); font-weight: 500; letter-spacing: 0.08em; color: var(--fg-2); }
-.nur__title {
-  margin-top: 18px;
-  font-family: var(--f-zh); font-weight: 500;
-  font-size: var(--t-h1); letter-spacing: 0.02em; line-height: 1.15;
-}
-.nur__field { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
-.chip {
+.pile { position: absolute; inset: 0; pointer-events: none; will-change: transform, opacity; }
+.pill {
   position: absolute; left: 0; top: 0;
-  padding: 9px 14px 10px;
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  font-family: var(--f-zh); font-size: clamp(14px, 1vw, 17px);
-  white-space: nowrap;
-  will-change: transform, opacity;
-  display: flex; gap: 10px; align-items: baseline;
-  opacity: 0;
+  visibility: hidden;
+  will-change: transform;
 }
-.chip small { font-family: var(--f-en); font-size: 11px; font-weight: 500; color: var(--fg-3); }
+.pill__in {
+  display: block;
+  padding: 0.78em 1.45em;
+  border-radius: 999px;
+  background: var(--pill);
+  color: var(--pill-ink);
+  font-family: var(--f-zh); font-weight: 500;
+  font-size: clamp(14px, 1.15vw, 20px);
+  white-space: nowrap;
+  box-shadow: 0 10px 22px -10px rgba(0, 0, 0, 0.6);
+  transform-origin: 50% 100%; /* squash from the floor up */
+}
+.nur__line {
+  position: absolute; left: 0; right: 0; top: 50%;
+  margin-top: -0.7em;
+  text-align: center;
+  font-family: var(--f-zh); font-weight: 400;
+  font-size: clamp(22px, 2.2vw, 40px);
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  opacity: 0;
+  padding: 0 var(--gutter);
+}
 
 /* the case card */
 .case {

@@ -21,10 +21,11 @@ const BEATS = [
   { s: 'open', p: 0.6, dur: 2, note: 'Connecting the dots：把分散的資訊連起來。' },
   { s: 'open', p: 0.703, dur: 2, note: 'Distilling what matters：提煉出真正重要的事。' },
   { s: 'open', p: 0.891, dur: 3.4, note: 'INTERPRETER：把複雜轉譯成可執行的策略。' },
-  { s: 'nur', p: 0.14, dur: 2.6, note: 'NURSTYLE：從真實顧客問題出發。問題散落在 IG、LINE、評論、Email。' },
-  { s: 'nur', p: 0.39, dur: 2.6, note: '我把這些問題整理成四個決策接觸點，FAQ 是其中之一。這是改版前。' },
-  { s: 'nur', p: 0.6, dur: 2.4, note: '改版後：結構清楚，AI 讀得懂。' },
-  { s: 'nur', p: 0.82, dur: 3, note: 'AI 搜尋測試：品牌頁面被引用與推薦。結構清楚的資訊，才會被 AI 引用。' },
+  { s: 'nur', p: 0.14, dur: 2.8, note: '這些是 NURSTYLE 顧客真實會問的問題，散落在各個管道。' },
+  { s: 'nur', p: 0.37, dur: 2.6, note: '從跨市場的品牌溝通，到 AI 時代的資訊轉譯。' },
+  { s: 'nur', p: 0.53, dur: 2.4, note: '我把它們整理成四個決策接觸點，FAQ 是其中之一。這是改版前。' },
+  { s: 'nur', p: 0.69, dur: 2.4, note: '改版後：結構清楚，AI 讀得懂。' },
+  { s: 'nur', p: 0.89, dur: 3, note: 'AI 搜尋測試：品牌頁面被引用與推薦。結構清楚的資訊，才會被 AI 引用。' },
   { s: 'map', p: 0.1, dur: 2.4, note: '把這個能力延伸到下一個問題：餐飲業的第二曲線。' },
   { s: 'map', p: 0.7, dur: 4, note: '台灣餐飲出海 2.0：從輸出服務，到輸出產品、風味與文化價值。' },
   { s: 'map', p: 0.9, dur: 2, note: '問題：沒有 Global BD 團隊，怎麼降低海外市場探索成本？' },
@@ -32,7 +33,7 @@ const BEATS = [
   { s: 'compass', p: 0.75, dur: 3.4, note: '從自然語言描述產品 → 定價、通路與買方、法規路徑、同業借鏡。' },
   { s: 'compass', p: 1, dur: 2, note: '進入 Demo。' },
 ];
-const CHAPTER_BEAT = [0, 7, 12, 15];
+const CHAPTER_BEAT = [0, 7, 13, 16];
 
 export function createPresenter({ lenis, yFor }) {
   const hud = document.getElementById('hud');

@@ -1,25 +1,32 @@
 /**
  * 02 NURSTYLE — real customer questions → FAQ before/after → cited by AI.
- * Same visual language as the opening: things float around the edges and get
- * pulled in. Here they are pulled into a card that rises from below (Maze-style).
  *
- *  0.00 ─ 0.30  questions float around the headline
- *  0.27 ─ 0.38  questions are pulled in; the case card rises
- *  0.42 ─ 0.58  the FAQ page wipes from Before to After
- *  0.50 ─ 0.70  dusk rises behind the card: plum → rose → full peach
- *  0.70 ─ 0.88  on peach: the takeaway, and the AI answer citing the page
- *  0.86 ─ 0.98  peach sinks back into night, ready for the map
+ *  0.00 ─ 0.17  question pills drop in and pile up (triggered, physics)
+ *  0.18 ─ 0.30  the pile rolls up and away like end credits, faster than the scroll
+ *  0.30 ─ 0.46  one line: 從跨市場的品牌溝通，到 AI 時代的資訊轉譯
+ *  0.44 ─ 0.53  the case card rises from below (Maze-style)
+ *  0.56 ─ 0.68  the FAQ page wipes from Before to After
+ *  0.62 ─ 0.78  dusk rises behind the card: plum → rose → full peach
+ *  0.78 ─ 0.95  on peach: the takeaway, and the AI answer citing the page
+ *  0.92 ─ 1.00  peach sinks back into night, ready for the map
  */
 import { QUESTIONS, TOUCHPOINTS, AI_ANSWER, FAQ_SHOTS } from '../data/content.js';
-import { lerp, range, ease, rng, fx } from '../lib/util.js';
+import { range, ease, rng, fx } from '../lib/util.js';
+import { createPile } from '../lib/pile.js';
 
-const CITED_AT = [0.74, 0.9]; // typing runs while p is inside this range
+const PILL_COLORS = [
+  { color: '#ff9478', ink: '#2a1424' }, // coral
+  { color: '#6e7bf2', ink: '#ffffff' }, // periwinkle
+  { color: '#f3ebe1', ink: '#2a1424' }, // cream sand
+];
+const DROP_LIVE = 0.08; // arriving later than this skips straight to the settled pile
+const CITED_AT = [0.81, 0.95]; // AI answer types while p is inside this range
 const Q_MS = 32, A_MS = 18; // per character
 
 export function createNur(root) {
   const $ = (s) => root.querySelector(s);
-  const head = $('#nurHead');
-  const field = $('#nurField');
+  const pileEl = $('#pile');
+  const lineEl = $('#nurLine');
   const card = $('#caseCard');
   const before = $('#baBefore'), after = $('#baAfter'), line = $('#baLine');
   const tagBefore = $('.ba__tag--before');
@@ -36,34 +43,20 @@ export function createNur(root) {
   before.innerHTML = FAQ_SHOTS.before ? `<img src="${FAQ_SHOTS.before}" alt="FAQ before" />` : MOCK_BEFORE;
   after.innerHTML = FAQ_SHOTS.after ? `<img src="${FAQ_SHOTS.after}" alt="FAQ after" />` : MOCK_AFTER;
 
-  // ── question chips ────────────────────────────────────────
-  const r = rng(23);
-  const chips = QUESTIONS.map((q, i) => {
-    const el = document.createElement('div');
-    el.className = 'chip';
-    el.innerHTML = `<span>${q.q}</span><small>${q.src}</small>`;
-    field.appendChild(el);
-    return { el, i, a: 0, band: 0.82 + r() * 0.3, jitter: (r() - 0.5) * 0.3, phase: r() * 6.28, pull: r(), w: 0, h: 0, x: 0, y: 0 };
-  });
+  // ── the pile: colours at random, but the same every run ──
+  const r = rng(7);
+  const pile = createPile(pileEl, QUESTIONS.map((q) => ({ text: q.q, ...PILL_COLORS[Math.floor(r() * 3)] })));
 
-  let vw, vh;
+  let vh = innerHeight;
   function layout() {
-    vw = innerWidth;
     vh = innerHeight;
-    const n = chips.length;
-    chips.forEach((c, k) => {
-      c.w = c.el.offsetWidth;
-      c.h = c.el.offsetHeight;
-      const a = (k / n) * Math.PI * 2 + c.jitter;
-      c.x = Math.cos(a) * vw * 0.36 * c.band;
-      c.y = Math.sin(a) * vh * 0.36 * c.band;
-      c.el._fx = null;
-    });
+    pile.layout();
   }
 
-  // ── AI answer typing (triggered, time-based) ──────────────
+  // ── per-frame loop: physics + AI answer typing ────────────
   const typing = { on: false, start: 0 };
-  (function loop() {
+  (function loop(now) {
+    pile.tick(now);
     if (typing.on) {
       const t = performance.now() - typing.start;
       const nq = Math.min(AI_ANSWER.query.length, Math.floor(t / Q_MS));
@@ -76,68 +69,55 @@ export function createNur(root) {
       aiCite.classList.toggle('is-on', na >= AI_ANSWER.answer.length);
     }
     requestAnimationFrame(loop);
-  })();
+  })(performance.now());
 
   let last = -1;
   function update(p, force) {
-    const floating = p > 0 && p < 0.4; // chips drift even when the scroll is still
-    if (!force && !floating && Math.abs(p - last) < 1e-5) return;
+    if (!force && Math.abs(p - last) < 1e-5) return;
     last = p;
-    const now = performance.now() / 1000;
 
-    // headline
-    const hin = ease.out(range(p, 0, 0.07));
-    const hout = ease.inOut(range(p, 0.24, 0.3));
-    fx(head, hin * (1 - hout), (1 - hin) * 40 - hout * 50);
-
-    // chips: float around the headline, then get pulled into the rising card
-    for (const c of chips) {
-      const tin = ease.out(range(p, 0.02 + c.i * 0.007, 0.07 + c.i * 0.007));
-      const d0 = 0.27 + c.pull * 0.05;
-      const tp = range(p, d0, d0 + 0.05);
-      const e = ease.in(tp);
-      const fl = 1 - e;
-      let x = c.x + Math.sin(now * 0.4 + c.phase) * 10 * fl;
-      let y = c.y + Math.cos(now * 0.33 + c.phase * 1.2) * 12 * fl + (1 - tin) * 30;
-      const ang = Math.atan2(y, x) + 0.9 * e, rad = Math.hypot(x, y) * (1 - e);
-      x = Math.cos(ang) * rad;
-      y = Math.sin(ang) * rad + vh * 0.02 * e;
-      const s = lerp(1, 0.4, e);
-      const o = tin * (1 - range(tp, 0.6, 1));
-      const key = `${x | 0}|${y | 0}|${s.toFixed(3)}|${o.toFixed(3)}`;
-      if (c.el._fx !== key) {
-        c.el._fx = key;
-        c.el.style.opacity = o;
-        c.el.style.visibility = o < 0.002 ? 'hidden' : 'visible';
-        c.el.style.transform = `translate(${x - c.w / 2}px, ${y - c.h / 2}px) scale(${s})`;
-      }
+    // the drop: plays live on arrival, settles instantly if we jumped past it
+    if (p <= 0.002) {
+      if (pile.started) pile.reset();
+    } else if (!pile.started) {
+      p < DROP_LIVE ? pile.start() : pile.settle();
     }
 
+    // end credits: the whole pile rolls up and away, faster than the scroll
+    const roll = ease.in(range(p, 0.18, 0.3));
+    pileEl.style.transform = `translateY(${-roll * vh * 1.3}px)`;
+    pileEl.style.opacity = 1 - range(p, 0.25, 0.3);
+
+    // one line
+    const lin = ease.out(range(p, 0.3, 0.35));
+    const lout = ease.inOut(range(p, 0.42, 0.46));
+    fx(lineEl, lin * (1 - lout), (1 - lin) * 40 - lout * 50);
+
     // the case card rises, holds, then gives way to the peach
-    const cin = ease.out(range(p, 0.29, 0.38));
-    const cout = ease.inOut(range(p, 0.64, 0.7));
+    const cin = ease.out(range(p, 0.44, 0.53));
+    const cout = ease.inOut(range(p, 0.76, 0.8));
     card.style.opacity = Math.min(1, cin * 2) * (1 - cout);
     card.style.visibility = cin * (1 - cout) < 0.002 ? 'hidden' : 'visible';
     card.style.transform = `translate(-50%, -50%) translateY(${(1 - cin) * 70 - cout * 4}vh) scale(${1 - cout * 0.03})`;
 
     // before → after wipe
-    const v = 100 * (1 - ease.inOut(range(p, 0.42, 0.58)));
+    const v = 100 * (1 - ease.inOut(range(p, 0.56, 0.68)));
     before.style.clipPath = `inset(0 ${100 - v}% 0 0)`;
     line.style.left = `${v}%`;
     line.style.opacity = v > 0.5 && v < 99.5 ? 1 : 0;
     tagBefore.style.opacity = range(v, 4, 14); // off once the page is all After
 
     // dusk rising to full peach, then sinking back to night
-    const rose = range(p, 0.5, 0.62) * (1 - range(p, 0.9, 0.98));
-    const peach = range(p, 0.6, 0.7) * (1 - range(p, 0.86, 0.95));
+    const rose = range(p, 0.62, 0.72) * (1 - range(p, 0.95, 1));
+    const peach = range(p, 0.7, 0.78) * (1 - range(p, 0.92, 0.98));
     skyRose.style.opacity = rose;
     skyPeach.style.opacity = peach;
     document.body.classList.toggle('is-light', peach > 0.5);
 
     // climax: takeaway + AI answer
-    const tt = ease.out(range(p, 0.7, 0.75));
-    const ta = ease.out(range(p, 0.73, 0.78));
-    const out = range(p, 0.86, 0.9);
+    const tt = ease.out(range(p, 0.78, 0.82));
+    const ta = ease.out(range(p, 0.8, 0.85));
+    const out = range(p, 0.92, 0.95);
     fx(citedTitle, tt * (1 - out), (1 - tt) * 40);
     fx(ai, ta * (1 - out), (1 - ta) * 50);
     const on = p >= CITED_AT[0] && p < CITED_AT[1];
@@ -163,12 +143,13 @@ const MOCK_BEFORE = `<div class="mock mock--before">
   <p>※ 以上若有未盡事宜，本公司保留修改權利。</p>
 </div>`;
 
+// After: wording taken from the NURSTYLE FAQ corpus (2026-06-01)
 const MOCK_AFTER = `<div class="mock mock--after">
   <h4>常見問題</h4>
-  <div class="m-cats"><span>尺寸與試穿</span><span>團體採購</span><span>出貨與售後</span><span>布料與保養</span></div>
-  <div class="m-q is-open">可以先預約試穿嗎？<em>可以。我們提供預約試穿與尺寸建議，平日與週末皆可預約，也能寄送樣衣到單位。</em></div>
-  <div class="m-q">單位一起訂購，有團購方案嗎？<span>＋</span></div>
-  <div class="m-q">值班 12 小時，穿起來會悶嗎？<span>＋</span></div>
-  <div class="m-q">多久可以出貨？<span>＋</span></div>
+  <div class="m-cats"><span>商品選購</span><span>訂單與購物</span><span>配送與交期</span><span>發票相關</span><span>退貨與退款</span><span>會員與帳號</span></div>
+  <div class="m-q is-open">可以試穿嗎？怎麼申請？<em>可以。NURSTYLE 提供現場試穿與商品寄送試穿服務兩種方式，可依照所在地區與需求選擇，再透過 LINE 提出申請。</em></div>
+  <div class="m-q">尺寸怎麼選？<span>＋</span></div>
+  <div class="m-q">團體採購有優惠嗎？<span>＋</span></div>
+  <div class="m-q">商品多久會出貨？<span>＋</span></div>
   <span class="m-schema">FAQPage schema</span>
 </div>`;

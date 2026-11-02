@@ -20,8 +20,7 @@ export const COMPASS = {
 };
 
 /**
- * NURSTYLE — real customer questions, grouped by the decision touchpoint
- * they were routed to. Replace with your actual collected questions.
+ * NURSTYLE — the decision touchpoints (tabs on the case card).
  */
 export const TOUCHPOINTS = [
   { id: 'line', en: 'LINE OA', zh: 'LINE 官方帳號' },
@@ -30,25 +29,31 @@ export const TOUCHPOINTS = [
   { id: 'group', en: 'Group Order', zh: '團體採購' },
 ];
 
+/**
+ * Customer questions that fall and pile up as pills. Taken from the NURSTYLE
+ * FAQ corpus (2026-06-01), shortened to read at a glance; `faq` is the source id.
+ */
 export const QUESTIONS = [
-  { q: '可以先預約試穿嗎？', src: 'IG DM', to: 'fit' },
-  { q: '尺寸要怎麼挑比較準？', src: 'LINE', to: 'faq' },
-  { q: '單位要一起訂，有團購價嗎？', src: 'Email', to: 'group' },
-  { q: '布料會不會透？', src: '評論', to: 'faq' },
-  { q: '可以繡名字和單位嗎？', src: 'LINE', to: 'group' },
-  { q: '多久可以出貨？', src: 'IG DM', to: 'line' },
-  { q: '洗了會縮水嗎？', src: 'FB', to: 'faq' },
-  { q: '有門市可以看實品嗎？', src: 'Google', to: 'fit' },
-  { q: '換尺寸要怎麼處理？', src: 'LINE', to: 'line' },
-  { q: '值班 12 小時穿起來會悶嗎？', src: 'Threads', to: 'faq' },
-  { q: '醫院統一採購怎麼報價？', src: 'Email', to: 'group' },
-  { q: '可以寄樣品到病房嗎？', src: 'IG DM', to: 'fit' },
-  { q: '訂單進度可以查嗎？', src: 'LINE', to: 'line' },
-  { q: '孕期也能穿嗎？', src: 'Dcard', to: 'faq' },
-  { q: '20 件以上怎麼算？', src: 'LINE', to: 'group' },
-  { q: '男生版型有嗎？', src: 'FB', to: 'fit' },
-  { q: '可以開統編嗎？', src: 'Email', to: 'line' },
-  { q: '抗菌是真的嗎？', src: '評論', to: 'faq' },
+  { q: '第一次買醫護服，怎麼挑？', faq: '1-1' },
+  { q: '尺寸怎麼選？', faq: '1-2' },
+  { q: '女版、男版、通用版差在哪？', faq: '1-3' },
+  { q: '可以試穿嗎？', faq: '1-4' },
+  { q: '這次和上次有色差？', faq: '1-5' },
+  { q: '可以匯款嗎？', faq: '2-2' },
+  { q: '團體採購有優惠嗎？', faq: '2-3' },
+  { q: '可以刺繡嗎？', faq: '2-4' },
+  { q: '多久會出貨？', faq: '3-1' },
+  { q: '預購什麼時候出貨？', faq: '3-2' },
+  { q: '多少免運？', faq: '3-3' },
+  { q: '怎麼查配送進度？', faq: '3-4' },
+  { q: '可以開統編發票嗎？', faq: '4-1' },
+  { q: '沒收到發票怎麼辦？', faq: '4-2' },
+  { q: '尺寸不合可以退貨嗎？', faq: '5-1' },
+  { q: '收到瑕疵怎麼辦？', faq: '5-2' },
+  { q: '退款多久入帳？', faq: '5-3' },
+  { q: '一定要註冊會員嗎？', faq: '6-1' },
+  { q: '診所訂購用誰的帳號？', faq: '6-3' },
+  { q: '帳號可以整合嗎？', faq: '6-4' },
 ];
 
 /**
