@@ -143,7 +143,7 @@ export function createMap(root) {
       if (d.d > R) continue;
       const edge = Math.min(1, (R - d.d) / 140);
       ctx.globalAlpha = (0.12 + 0.3 * edge * (1 - d.d / maxDist)) * dimTo + 0.0;
-      ctx.fillStyle = edge < 0.4 ? '#ff4a1c' : '#efeee9';
+      ctx.fillStyle = edge < 0.4 ? '#6aa6ff' : '#f5f5f7';
       ctx.fillRect(d.x - d.s / 2, d.y - d.s / 2, d.s, d.s);
     }
   }

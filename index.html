@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>INTERPRETER.</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='5' y='5' width='6' height='6' fill='%23111'/%3E%3C/svg%3E" />
+    <title>INTERPRETER</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='5' fill='%232F7BFF'/%3E%3C/svg%3E" />
   </head>
-  <body>
+  <body class="is-intro">
     <!-- ───────────── Fixed chrome ───────────── -->
     <header class="chrome" id="chrome">
       <div class="chrome__tl">
-        <span class="mark">INTERPRETER<i class="sq"></i></span>
+        <span class="mark">INTERPRETER</span>
         <span class="chrome__chapter mono" id="chapterLabel">00 — Opening Gallery</span>
       </div>
       <div class="chrome__tr mono">
@@ -33,45 +33,20 @@
     </aside>
 
     <main id="scroller">
-      <!-- ═════════ 01 OPENING GALLERY → INTERPRETER. → 80/20 ═════════ -->
-      <section class="scene scene--open" id="open" data-chapter="0" style="--len: 1100">
+      <!-- ═════════ 01 OPENING GALLERY → orb → INTERPRETER → 80/20 ═════════ -->
+      <section class="scene scene--open" id="open" data-chapter="0" style="--len: 1300">
         <div class="stage">
-          <div class="intro" id="intro">
-            <p class="mono intro__kicker">A digital exhibition in four rooms</p>
-            <h1 class="intro__title">
-              <span class="line"><span>Works,</span></span>
-              <span class="line"><span><em>interpreted.</em></span></span>
-            </h1>
-            <p class="intro__zh">品牌視覺・包裝・平面・AI 創作・音樂封面</p>
-          </div>
-
           <div class="viewport3d" id="viewport3d">
             <div class="world" id="world"></div>
           </div>
 
-          <!-- Focus bracket (follows the current piece) -->
-          <div class="bracket" id="bracket"><i></i><i></i><i></i><i></i></div>
-          <div class="caption mono" id="caption">
-            <div class="caption__l"><span class="dim" id="capIdx">01/28</span><b id="capTitle"></b></div>
-            <div class="caption__r"><span class="dim" id="capYear"></span><b id="capCat"></b></div>
+          <!-- the interpreter: works dissolve into it -->
+          <div class="orb" id="orbWrap">
+            <canvas id="orb"></canvas>
+            <p class="orb__status" id="orbStatus"><span id="orbText"></span><i class="orb__dots" id="orbDots"><b>.</b><b>.</b><b>.</b></i></p>
           </div>
 
-          <div class="sheetlabel mono" id="sheetLabel">
-            <span>Contact sheet — 28 works, 5 disciplines</span>
-            <span class="dim">Sorted by discipline</span>
-          </div>
-
-          <!-- 02 INTERPRETER. -->
-          <div class="interp" id="interp">
-            <h2 class="interp__word" id="interpWord" aria-label="INTERPRETER.">
-              <span class="interp__letters" id="interpLetters"></span><span class="interp__dot" id="interpDot"></span>
-            </h2>
-            <div class="interp__sub">
-              <p class="mono">02 — The common thread</p>
-              <p class="interp__zh">把複雜的市場、消費者語言與品牌價值，<br />轉譯成可執行的策略。</p>
-              <p class="interp__en"><em>Translating complexity into strategy that can be acted on.</em></p>
-            </div>
-          </div>
+          <h2 class="interp" id="interp" aria-label="INTERPRETER">INTERPRETER</h2>
 
           <!-- 80/20 -->
           <div class="pareto" id="pareto">
@@ -79,7 +54,7 @@
             <div class="pareto__text">
               <p class="pareto__num"><span>80</span><i>/</i><span>20</span></p>
               <p class="pareto__zh">從複雜的問題中，<br />找出最值得投入的切入點。</p>
-              <p class="pareto__en mono">Find the 20% that moves the other 80%.</p>
+              <p class="pareto__en">Find the 20% that moves the other 80%.</p>
             </div>
           </div>
         </div>
@@ -91,7 +66,7 @@
           <div class="nur__head" id="nurHead">
             <p class="mono">Case — NURSTYLE · SEO / AEO / GEO</p>
             <h2 class="nur__title">從真實顧客問題出發</h2>
-            <p class="nur__en"><em>Start from what customers actually ask.</em></p>
+            <p class="nur__en">Start from what customers actually ask.</p>
           </div>
           <div class="nur__field" id="nurField"></div>
           <div class="nur__cols" id="nurCols"></div>
@@ -107,7 +82,7 @@
           </div>
           <div class="nur__out" id="nurOut">
             <p class="nur__outzh">結構清楚的資訊，<br />才會被 AI 引用與推薦。</p>
-            <p class="mono dim">Structure is what gets cited.</p>
+            <p class="nur__outen">Structure is what gets cited.</p>
           </div>
         </div>
       </section>
@@ -148,7 +123,7 @@
         <div class="stage">
           <div class="cmp__head" id="cmpHead">
             <p class="mono">04 — Working prototype</p>
-            <h2 class="cmp__title">EXPORT<br />COMPASS<i class="sq"></i></h2>
+            <h2 class="cmp__title">Export<br />Compass</h2>
             <p class="cmp__zh">AI 市場探索工作台</p>
           </div>
           <svg class="cmp__rose" id="cmpRose" viewBox="-100 -100 200 200" aria-hidden="true">

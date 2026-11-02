@@ -1,13 +1,7 @@
-import '@fontsource-variable/inter-tight';
-import '@fontsource/instrument-serif/400.css';
-import '@fontsource/instrument-serif/400-italic.css';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/500.css';
+import '@fontsource-variable/inter/opsz.css'; // optical sizes: Display cut at large sizes, like SF Pro
 import '@fontsource/noto-sans-tc/400.css';
 import '@fontsource/noto-sans-tc/500.css';
 import '@fontsource/noto-sans-tc/600.css';
-import '@fontsource/noto-serif-tc/500.css';
-import '@fontsource/noto-serif-tc/600.css';
 import './style.css';
 
 import Lenis from 'lenis';
@@ -24,10 +18,10 @@ history.scrollRestoration = 'manual';
 document.getElementById('profileName').textContent = PROFILE.name;
 document.getElementById('profileMeta').textContent = `${PROFILE.place} ${PROFILE.year}`;
 
-const CHAPTERS = ['01 — Opening Gallery', '02 — INTERPRETER.', '03 — From Experience to AI', '04 — Export Compass'];
+const CHAPTERS = ['01 — Opening Gallery', '02 — Interpreter', '03 — From Experience to AI', '04 — Export Compass'];
 
 async function boot() {
-  await document.fonts.ready; // layouts measure type (the full stop), so wait for fonts
+  await document.fonts.ready; // layouts measure type, (the 80/20 grid), so wait for fonts
 
   const sections = {
     open: document.getElementById('open'),

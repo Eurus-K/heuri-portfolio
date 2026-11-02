@@ -10,6 +10,9 @@ export const PROFILE = {
   year: '2026',
 };
 
+/** Opening: what appears under the orb before INTERPRETER (one orb palette each). */
+export const STATUS_LINES = ['Seeing beyond the surface', 'Connecting the dots', 'Distilling what matters'];
+
 /** EXPORT COMPASS demo — set the URL of your running demo (local or deployed). */
 export const COMPASS = {
   url: '', // e.g. 'http://localhost:3000' — empty = show the built-in preview card

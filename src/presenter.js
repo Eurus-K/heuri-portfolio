@@ -13,12 +13,15 @@
  * `dur` is the travel time to reach that beat (seconds).
  */
 const BEATS = [
-  { s: 'open', p: 0, dur: 1.2, note: '開場：這是我跨領域的作品——品牌、包裝、平面、AI、音樂封面。' },
-  { s: 'open', p: 0.19, dur: 3.2, note: '穿過作品：每一件都是在不同市場、不同受眾之間做轉譯。' },
-  { s: 'open', p: 0.36, dur: 3, note: '（繼續穿越）' },
-  { s: 'open', p: 0.485, dur: 2.4, note: '全部攤開：28 件作品、5 種領域。看起來很分散——' },
-  { s: 'open', p: 0.72, dur: 3.6, note: '但它們有一個共通點：INTERPRETER. 把複雜轉譯成可執行的策略。' },
-  { s: 'open', p: 0.93, dur: 2.6, note: '80/20：從複雜問題中，找出最值得投入的切入點。' },
+  { s: 'open', p: 0, dur: 1.2, note: '（不說話）讓作品自己出場：品牌、包裝、平面、AI、音樂封面。' },
+  { s: 'open', p: 0.13, dur: 3.4, note: '穿過作品。每一件都在不同市場、不同受眾之間做轉譯。' },
+  { s: 'open', p: 0.25, dur: 2.8, note: '（繼續穿越，作品開始聚向中心）' },
+  { s: 'open', p: 0.36, dur: 2.6, note: '這些作品看起來很分散，但背後是同一種能力——' },
+  { s: 'open', p: 0.435, dur: 2, note: 'Seeing beyond the surface：看穿表面。' },
+  { s: 'open', p: 0.525, dur: 2, note: 'Connecting the dots：把分散的資訊連起來。' },
+  { s: 'open', p: 0.615, dur: 2, note: 'Distilling what matters：提煉出真正重要的事。' },
+  { s: 'open', p: 0.8, dur: 3.4, note: 'INTERPRETER：把複雜轉譯成可執行的策略。' },
+  { s: 'open', p: 0.975, dur: 2.6, note: '80/20：從複雜問題中，找出最值得投入的切入點。' },
   { s: 'nur', p: 0.28, dur: 2.6, note: 'NURSTYLE：從真實顧客問題出發，散落在 IG、LINE、評論、Email。' },
   { s: 'nur', p: 0.5, dur: 2.2, note: '重新整理成四個決策接觸點：LINE OA、FAQ、試穿服務、團體採購。' },
   { s: 'nur', p: 0.8, dur: 3, note: '後續 AI 搜尋測試：品牌頁面被引用與推薦。' },
@@ -30,7 +33,7 @@ const BEATS = [
   { s: 'compass', p: 0.75, dur: 3.4, note: '從自然語言描述產品 → 定價、通路與買方、法規路徑、同業借鏡。' },
   { s: 'compass', p: 1, dur: 2, note: '進入 Demo。' },
 ];
-const CHAPTER_BEAT = [0, 4, 10, 13];
+const CHAPTER_BEAT = [0, 7, 13, 16];
 
 export function createPresenter({ lenis, yFor }) {
   const hud = document.getElementById('hud');
