@@ -1,17 +1,17 @@
 /**
- * 04 EXPORT COMPASS — the needle settles, the compass opens into the
- * product window, which then goes full-bleed and hands over to the live demo.
+ * 04 EXPORT COMPASS — the last scene. The title and compass arrive, the needle
+ * settles on a heading, and a single pill opens the live demo in a new tab.
+ * The dawn fades back to night here, and at the very end everything scrolls up
+ * and leaves the screen black.
  *
- *  0.00 ─ 0.28  wordmark + compass rose, needle searches then settles
- *  0.28 ─ 0.45  rose collapses, window opens
- *  0.45 ─ 0.75  product description → four modules → plan
- *  0.76 ─ 0.92  window goes full-bleed; demo iframe (if configured) fades in
+ * Timeline (p, after the shared first screen; see s0 below):
+ *  0.00 ─ 0.30  title and compass arrive; needle searches, then settles
+ *  0.34 ─ 0.44  the demo pill rises in
+ *  0.78 ─ 1.00  everything scrolls up and away: the screen ends black
  */
 import { COMPASS } from '../data/content.js';
-import { range, lerp, ease, fx, typeText } from '../lib/util.js';
+import { range, lerp, ease, fx } from '../lib/util.js';
 import { setCompassSky } from '../lib/sky.js';
-
-const PROMPT = '台灣手工鳳梨酥，想試探南加州與新加坡的通路。';
 
 export function createCompass(root) {
   const $ = (s) => root.querySelector(s);
@@ -19,13 +19,8 @@ export function createCompass(root) {
   const rose = $('#cmpRose');
   const needle = $('#roseNeedle');
   const ticks = $('#roseTicks');
-  const win = $('#window');
-  const body = $('#windowBody');
-  const input = $('#previewInput');
-  const mods = [...root.querySelectorAll('.mod')];
-  const out = $('#previewOut');
-  const enter = $('#enterDemo');
-  const urlEl = $('#windowUrl');
+  const cta = $('#enterDemo');
+  const group = $('#cmpGroup');
 
   for (let a = 0; a < 360; a += 15) {
     const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -38,21 +33,9 @@ export function createCompass(root) {
     ticks.appendChild(l);
   }
 
-  let iframe = null;
-  if (COMPASS.url) {
-    urlEl.textContent = COMPASS.url.replace(/^https?:\/\//, '');
-    enter.href = COMPASS.url;
-  }
-  enter.addEventListener('click', (e) => {
-    if (!COMPASS.url) { e.preventDefault(); return; }
-    if (COMPASS.openInIframe && iframe) {
-      e.preventDefault();
-      iframe.style.pointerEvents = 'auto';
-      enter.style.opacity = 0;
-      enter.classList.remove('is-live');
-      win.classList.add('is-interactive');
-    }
-  });
+  // opens the live demo in a new tab, so the presentation stays where it is
+  if (COMPASS.url) cta.href = COMPASS.url;
+  else cta.addEventListener('click', (e) => e.preventDefault());
 
   let last = -1;
   function update(raw, force) {
@@ -64,46 +47,27 @@ export function createCompass(root) {
     const p = range(raw, s0, 1);
     const arrive = ease.out(range(raw, s0 * 0.85, s0 + 0.04));
 
+    // the dawn from the map fades back to night as the compass arrives
+    setCompassSky(raw > 0 ? 0.65 * (1 - ease.inOut(range(raw, s0 * 0.5, s0 + 0.12))) : null);
+
     // needle: searches, overshoots, settles on a heading
-    const n = range(p, 0.02, 0.26);
+    const n = range(p, 0.02, 0.3);
     const angle = lerp(-140, 52, ease.out(n)) + Math.sin(n * Math.PI * 3) * 18 * (1 - n);
     needle.setAttribute('transform', `rotate(${angle})`);
 
-    // daybreak: carries on from the map's dawn (0.65) and climbs as the window opens
-    setCompassSky(raw > 0 ? lerp(0.65, 1.7, ease.inOut(range(p, 0.05, 0.5))) : null);
+    // the head moves via `top` + its own transform, so fade/lift it with opacity + margin
+    head.style.opacity = arrive;
+    head.style.marginTop = `${(1 - arrive) * 40}px`;
+    rose.style.opacity = arrive;
 
-    const open = ease.inOutQuart(range(p, 0.28, 0.44));
-    fx(head, arrive * (1 - range(p, 0.26, 0.34)), (1 - arrive) * 40 - range(p, 0.26, 0.34) * 30);
-    rose.style.opacity = arrive * (1 - open);
-    rose.style.transform = `translateY(-50%) scale(${1 - open * 0.6}) rotate(${open * 90}deg)`;
+    const c = ease.out(range(p, 0.34, 0.44));
+    fx(cta, c, (1 - c) * 24);
+    cta.classList.toggle('is-live', c > 0.5);
 
-    // window: opens from a line, then goes full-bleed
-    const full = ease.inOutQuart(range(p, 0.76, 0.9));
-    const ins = (1 - open) * 50;
-    win.style.opacity = open > 0 ? 1 : 0;
-    win.style.clipPath = `inset(${ins}% ${ins}% ${ins}% ${ins}%)`;
-    win.style.width = lerp(72, 100, full) + 'vw';
-    win.style.height = lerp(72, 100, full) + 'vh';
-
-    input.textContent = typeText(PROMPT, range(p, 0.46, 0.56));
-    mods.forEach((m, k) => m.classList.toggle('is-on', p > 0.57 + k * 0.035));
-    out.style.opacity = range(p, 0.71, 0.74);
-
-    if (COMPASS.url && COMPASS.openInIframe && full > 0.2 && !iframe) {
-      iframe = document.createElement('iframe');
-      iframe.src = COMPASS.url;
-      iframe.style.opacity = 0;
-      iframe.style.pointerEvents = 'none';
-      iframe.style.transition = 'opacity 0.8s';
-      iframe.style.background = 'var(--paper)';
-      body.appendChild(iframe);
-    }
-    if (iframe) iframe.style.opacity = full > 0.95 ? 1 : 0;
-
-    document.body.classList.toggle('is-handoff', full > 0.4);
-    const e = range(p, 0.9, 0.94);
-    enter.style.opacity = e;
-    enter.classList.toggle('is-live', e > 0.5);
+    // the end: everything scrolls up and away, leaving black
+    const out = ease.in(range(p, 0.78, 1));
+    group.style.transform = `translateY(${-out * 110}vh)`;
+    document.body.classList.toggle('is-end', out > 0.6);
   }
 
   return { layout: () => update(last < 0 ? 0 : last, true), update, chapter: () => 3 };

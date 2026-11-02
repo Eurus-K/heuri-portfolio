@@ -122,40 +122,21 @@
         </div>
       </section>
 
-      <!-- ═════════ 04 EXPORT COMPASS ═════════ -->
-      <section class="scene scene--compass" id="compass" data-chapter="3" style="--len: 550">
+      <!-- ═════════ 04 EXPORT COMPASS — the last scene ═════════ -->
+      <section class="scene scene--compass" id="compass" data-chapter="3" style="--len: 450">
         <div class="stage">
-          <div class="cmp__head" id="cmpHead">
-            <h2 class="cmp__title">Export<br />Compass</h2>
-          </div>
-          <svg class="cmp__rose" id="cmpRose" viewBox="-100 -100 200 200" aria-hidden="true">
-            <circle r="96" />
-            <circle r="60" class="thin" />
-            <g id="roseTicks"></g>
-            <path id="roseNeedle" d="M0 -84 L5 0 L0 10 L-5 0 Z" />
-          </svg>
-
-          <div class="window" id="window">
-            <div class="window__bar mono">
-              <span class="window__dots"><i></i><i></i><i></i></span>
-              <span>export-compass</span>
-              <span class="dim" id="windowUrl">demo</span>
+          <div class="cmp-group" id="cmpGroup">
+            <div class="cmp__head" id="cmpHead">
+              <h2 class="cmp__title">Export<br />Compass</h2>
+              <a class="cmp__cta" id="enterDemo" href="#" target="_blank" rel="noopener">Where next <span aria-hidden="true">↗</span></a>
             </div>
-            <div class="window__body" id="windowBody">
-              <div class="preview">
-                <p class="mono dim">01 — Describe your product</p>
-                <p class="preview__input" id="previewInput"></p>
-                <div class="preview__mods" id="previewMods">
-                  <div class="mod"><span class="mono">A</span><b>定價</b><em>Pricing</em></div>
-                  <div class="mod"><span class="mono">B</span><b>通路與買方</b><em>Channels &amp; buyers</em></div>
-                  <div class="mod"><span class="mono">C</span><b>法規路徑</b><em>Regulatory path</em></div>
-                  <div class="mod"><span class="mono">D</span><b>同業借鏡</b><em>Peer cases</em></div>
-                </div>
-                <p class="preview__out mono" id="previewOut">→ A market-entry plan you can go and validate.</p>
-              </div>
-            </div>
+            <svg class="cmp__rose" id="cmpRose" viewBox="-100 -100 200 200" aria-hidden="true">
+              <circle r="96" />
+              <circle r="60" class="thin" />
+              <g id="roseTicks"></g>
+              <path id="roseNeedle" d="M0 -84 L5 0 L0 10 L-5 0 Z" />
+            </svg>
           </div>
-          <a class="enter mono" id="enterDemo" href="#" role="button">Enter demo ↗</a>
         </div>
       </section>
     </main>

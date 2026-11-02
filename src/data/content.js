@@ -13,10 +13,9 @@ export const PROFILE = {
 /** Opening: what appears under the orb before INTERPRETER (one orb palette each). */
 export const STATUS_LINES = ['Seeing beyond the surface', 'Connecting the dots', 'Distilling what matters'];
 
-/** EXPORT COMPASS demo — set the URL of your running demo (local or deployed). */
+/** EXPORT COMPASS — the live demo the last button opens (in a new tab). */
 export const COMPASS = {
-  url: '', // e.g. 'http://localhost:3000' — empty = show the built-in preview card
-  openInIframe: true, // false = button opens the demo in the same tab
+  url: 'https://export-compass-demo-1103.eurus-k.chatgpt.site/',
 };
 
 /**
