@@ -11,6 +11,7 @@
 import { geoNaturalEarth1, geoPath } from 'd3-geo';
 import { feature } from 'topojson-client';
 import land110 from 'world-atlas/land-110m.json';
+import taiwan from '../data/taiwan.json'; // Natural Earth 50m, so the island reads as a shape
 import { ORIGIN, DESTINATIONS } from '../data/content.js';
 import { range, ease, fx } from '../lib/util.js';
 
@@ -28,6 +29,7 @@ export function createMap(root) {
   const head = $('#mapHead');
   const rows = [...root.querySelectorAll('.shift__row')];
   const question = $('#question');
+  const dawn = $('#dawn');
 
   const canvas = document.createElement('canvas');
   canvas.className = 'map__dots';
@@ -118,13 +120,13 @@ export function createMap(root) {
       return { dst, glow, path, node, pulse, head, L, t0, t1, lab };
     });
 
-    const oNode = el('rect', { class: 'origin', width: 9, height: 9, x: origin[0] - 4.5, y: origin[1] - 4.5 });
+    const oNode = el('path', { class: 'tw', d: geoPath(proj)(taiwan) });
     const oPulse = el('circle', { class: 'pulse', cx: origin[0], cy: origin[1], r: 0 });
     svg.append(oPulse, oNode);
     const oLab = document.createElement('div');
     oLab.className = 'mlabel mlabel--origin';
     oLab.innerHTML = `<b>${ORIGIN.zh}</b><span>${ORIGIN.id} · ${ORIGIN.en}</span>`;
-    oLab.style.left = origin[0] + 'px';
+    oLab.style.left = origin[0] + 6 + 'px';
     oLab.style.top = origin[1] + 'px';
     labelsEl.appendChild(oLab);
     labels = { oNode, oPulse, oLab };
@@ -155,6 +157,11 @@ export function createMap(root) {
     const dim = 1 - q * 0.72;
 
     drawDots(ease.out(range(p, 0.02, 0.26)), dim);
+
+    // dawn: rises with the routes, brightest at 1.0 → 2.0, settles for the question
+    const rise = ease.inOut(range(p, 0.24, 0.7));
+    dawn.style.opacity = rise * (1 - q * 0.35);
+    dawn.style.transform = `translateY(${(1 - rise) * 30}vh)`;
     svg.style.opacity = dim;
     labelsEl.style.opacity = 1 - q;
 
