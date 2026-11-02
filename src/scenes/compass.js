@@ -7,11 +7,11 @@
  * Timeline (p, after the shared first screen; see s0 below):
  *  0.00 ─ 0.30  title and compass arrive; needle searches, then settles
  *  0.34 ─ 0.44  the demo pill rises in
- *  0.78 ─ 1.00  everything scrolls up and away: the screen ends black
+ *  0.70 ─ 1.00  everything scrolls up and away, faster than the scroll: black
  */
 import { COMPASS } from '../data/content.js';
 import { range, lerp, ease, fx } from '../lib/util.js';
-import { setCompassSky } from '../lib/sky.js';
+import { setCompassSky, setEndGlow } from '../lib/sky.js';
 
 export function createCompass(root) {
   const $ = (s) => root.querySelector(s);
@@ -65,9 +65,10 @@ export function createCompass(root) {
     cta.classList.toggle('is-live', c > 0.5);
 
     // the end: everything scrolls up and away, leaving black
-    const out = ease.in(range(p, 0.78, 1));
+    const out = ease.inOut(range(p, 0.7, 1));
     group.style.transform = `translateY(${-out * 110}vh)`;
     document.body.classList.toggle('is-end', out > 0.6);
+    setEndGlow(out);
   }
 
   return { layout: () => update(last < 0 ? 0 : last, true), update, chapter: () => 3 };

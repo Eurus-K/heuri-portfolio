@@ -9,6 +9,7 @@
  */
 const el = document.getElementById('skyGlobal');
 const dawn = document.getElementById('skyDawn');
+const end = document.getElementById('skyEnd');
 const state = { map: 0, mapOn: false, compass: null };
 let lastKey = '';
 
@@ -29,6 +30,11 @@ export function setMapSky(p, level) {
   state.mapOn = p > 0;
   state.map = level;
   paint();
+}
+
+/** the closing glow, 0..1 (mirror of the opening's plum glow) */
+export function setEndGlow(v) {
+  end.style.opacity = v;
 }
 
 /** compass: null while it hasn't started, else level 0..2 */

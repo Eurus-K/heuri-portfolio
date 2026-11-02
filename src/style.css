@@ -391,6 +391,11 @@ body.is-light .logo { color: var(--sheet-ink); }
 .scene--map, .scene--compass { margin-top: -100vh; }
 #scroller { position: relative; z-index: 1; }
 .sky-global { position: fixed; inset: 0; z-index: 0; background: var(--night); opacity: 0; pointer-events: none; overflow: hidden; }
+/* the ending mirrors the opening: the same plum glow, rising from the bottom */
+.sky-global__end {
+  position: absolute; inset: 0; opacity: 0;
+  background: radial-gradient(120% 85% at 50% 100%, #3a1c33 0%, var(--bg) 45%, var(--night) 100%);
+}
 .sky-global__dawn {
   position: absolute; inset: 0; opacity: 0; transform-origin: 50% 100%;
   background: radial-gradient(130% 70% at 50% 120%, #f6c2aa 0%, #e4908a 20%, #9e4e6e 42%, rgba(60, 28, 52, 0.5) 66%, transparent 92%);
