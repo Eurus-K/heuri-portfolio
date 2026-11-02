@@ -111,7 +111,8 @@ export function createNur(root) {
 
     // the line rises in; the card then rises over it
     const lin = ease.out(range(p, LINE[0], LINE[1]));
-    fx(lineEl, lin, (1 - lin) * 40);
+    const lout = range(p, CARD[1] - 0.006, CARD[1]); // gone once the card covers it, so it can't reappear later
+    fx(lineEl, lin * (1 - lout), (1 - lin) * 40);
     const cin = ease.out(range(p, CARD[0], CARD[1]));
     cardRise.style.transform = `translateY(${(1 - cin) * 100}vh)`;
     // the card section sits on flat night (Maze-style: plain ground, plain card)
