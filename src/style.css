@@ -350,13 +350,13 @@ body.is-light .logo { color: var(--sheet-ink); }
   font-size: var(--t-h1); line-height: 1.05; letter-spacing: -0.03em;
 }
 /* the numbers row (Maze's logo row, but evidence) */
-.stats { display: flex; gap: clamp(32px, 7vw, 120px); justify-content: center; }
+.stats { display: flex; gap: clamp(56px, 9vw, 160px); justify-content: center; }
 .stat__v {
   font-family: var(--f-en); font-weight: 400;
   font-size: var(--t-h2); line-height: 1; letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
-.stat__l { margin-top: 10px; font-family: var(--f-zh); font-size: clamp(13px, 0.95vw, 16px); line-height: 1.55; color: var(--fg-2); }
+.stat__l { margin-top: 12px; font-family: var(--f-zh); font-size: clamp(13px, 0.95vw, 16px); line-height: 1.55; color: var(--fg-2); white-space: nowrap; }
 /* the AI answer: white, like the case card before it */
 .ai {
   width: min(680px, 86vw);

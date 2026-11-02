@@ -76,9 +76,9 @@ export const RESULTS = {
   eyebrow: 'SEO · AEO · GEO',
   title: 'From brand to search',
   stats: [
-    { value: '7 / 10', label: '沒提品牌的診所問題<br />AI 主動推薦' },
-    { value: '6 / 10', label: 'FAQ、團購、試穿頁<br />成為 AI 引用來源' },
-    { value: '3 題', label: '推薦排名<br />第一' },
+    { value: '7 / 10', label: '沒提品牌的診所問題，AI 主動推薦' },
+    { value: '6 / 10', label: 'FAQ、團購、試穿頁成為 AI 引用來源' },
+    { value: '3 題', label: '推薦排名第一' },
   ],
   note: '未登入網頁搜尋・2026-11-01・28 個不帶品牌名的問法',
 };

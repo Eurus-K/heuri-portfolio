@@ -44,6 +44,7 @@ export function createNur(root) {
   const before = $('#baBefore'), after = $('#baAfter'), line = $('#baLine');
   const tagBefore = $('.ba__tag--before');
   const skyFlat = $('#skyFlat');
+  const cited = $('#cited');
   const resHead = $('.cited__head');
   const resStats = $('#resStats');
   const resNote = $('#resNote');
@@ -79,9 +80,17 @@ export function createNur(root) {
   };
   afterImg?.addEventListener('load', measureAfter);
 
+  // heights of the results that reveal one by one, so the column can stay centred
+  let revealH = [0, 0, 0];
+  const measureResults = () => {
+    const gap = parseFloat(getComputedStyle(cited).rowGap) || 0;
+    revealH = [resStats, ai, resNote].map((el) => el.offsetHeight + gap);
+  };
+
   function layout() {
     pile.layout();
     measureAfter();
+    measureResults();
   }
 
   // ── per-frame loop: physics + AI answer typing ────────────
@@ -148,6 +157,10 @@ export function createNur(root) {
     const ts = ease.out(range(p, 0.49, 0.54));
     const ta = ease.out(range(p, 0.52, 0.57));
     const tn = ease.out(range(p, 0.55, 0.6));
+    // keep what is visible centred: items not yet revealed don't count yet
+    if (!revealH[1]) measureResults();
+    const pending = (1 - ts) * revealH[0] + (1 - ta) * revealH[1] + (1 - tn) * revealH[2];
+    cited.style.transform = `translateY(${pending / 2}px)`;
     const out = range(p, 0.85, 0.88);
     fx(resHead, tt * (1 - out), (1 - tt) * 60 - out * 40);
     fx(resStats, ts * (1 - out), (1 - ts) * 60 - out * 40);
