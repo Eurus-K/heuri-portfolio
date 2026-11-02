@@ -10,9 +10,10 @@
  *  CARD         the card rises from below over the line; the sky turns flat night
  *  0.12 ─ 0.27  the FAQ page wipes from Before to After
  *  0.29 ─ 0.42  the After page scrolls down: every question AI can read
- *  0.42 ─ 0.58  dusk rises behind the card: night → rose → full peach
- *  0.60 ─ 0.88  on peach: the takeaway, and the AI answer citing the page
- *  0.86 ─ 0.98  peach sinks back into night, ready for the map
+ *  0.44 ─ 0.51  the card scrolls up and away; the takeaway rises (still flat night)
+ *  0.50 ─ 0.88  the AI answer citing the page
+ *  0.86 ─ 0.98  flat night fades back into the dusk gradient for the map
+ *  (the rose → peach climax layers are kept in the markup, unused for now)
  */
 import { QUESTIONS, TOUCHPOINTS, AI_ANSWER, FAQ_SHOTS } from '../data/content.js';
 import { range, ease, rng, fx } from '../lib/util.js';
@@ -30,7 +31,7 @@ const LINE = [0.06, 0.077];
 const CARD = [0.082, 0.107];
 const AFTER_SCROLL = [0.29, 0.42];
 const AFTER_END = 0.875; // where the questions end on the full-page capture (the footer starts below)
-const CITED_AT = [0.63, 0.88]; // AI answer types while p is inside this range
+const CITED_AT = [0.53, 0.88]; // AI answer types while p is inside this range
 const Q_MS = 32, A_MS = 18; // per character
 
 export function createNur(root) {
@@ -42,7 +43,7 @@ export function createNur(root) {
   const ba = $('#ba');
   const before = $('#baBefore'), after = $('#baAfter'), line = $('#baLine');
   const tagBefore = $('.ba__tag--before');
-  const skyFlat = $('#skyFlat'), skyRose = $('#skyRose'), skyPeach = $('#skyPeach');
+  const skyFlat = $('#skyFlat');
   const citedTitle = $('.cited__title');
   const ai = $('#ai');
   const aiQ = $('#aiQ'), aiA = $('#aiA'), aiCite = $('#aiCite');
@@ -116,11 +117,10 @@ export function createNur(root) {
     // the card section sits on flat night (Maze-style: plain ground, plain card)
     skyFlat.style.opacity = cin * (1 - range(p, 0.86, 0.94));
 
-    // the card holds, then gives way to the peach
-    const cout = ease.inOut(range(p, 0.56, 0.6));
-    cardCol.style.opacity = 1 - cout;
+    // the card holds, then scrolls up and away like a page (Maze-style)
+    const cout = ease.in(range(p, 0.44, 0.5));
     cardCol.style.visibility = cout > 0.998 ? 'hidden' : 'visible';
-    cardCol.style.transform = `translate(-50%, -50%) translateY(${-cout * 4}vh) scale(${1 - cout * 0.03})`;
+    cardCol.style.transform = `translate(-50%, -50%) translateY(${-cout * 115}vh)`;
 
     // before → after wipe, then the After page scrolls down to show everything
     const v = 100 * (1 - ease.inOut(range(p, 0.12, 0.27)));
@@ -131,19 +131,12 @@ export function createNur(root) {
     line.style.opacity = v > 0.5 && v < 99.5 ? 1 : 0;
     tagBefore.style.opacity = range(v, 4, 14); // off once the page is all After
 
-    // dusk rising to full peach, then sinking back to night
-    const rose = range(p, 0.42, 0.52) * (1 - range(p, 0.9, 0.98));
-    const peach = range(p, 0.5, 0.58) * (1 - range(p, 0.86, 0.93));
-    skyRose.style.opacity = rose;
-    skyPeach.style.opacity = peach;
-    document.body.classList.toggle('is-light', peach > 0.5);
-
-    // climax: takeaway + AI answer
-    const tt = ease.out(range(p, 0.6, 0.64));
-    const ta = ease.out(range(p, 0.62, 0.67));
+    // the takeaway rises as the card leaves, then the AI answer under it
+    const tt = ease.out(range(p, 0.46, 0.51));
+    const ta = ease.out(range(p, 0.5, 0.55));
     const out = range(p, 0.85, 0.88);
-    fx(citedTitle, tt * (1 - out), (1 - tt) * 40);
-    fx(ai, ta * (1 - out), (1 - ta) * 50);
+    fx(citedTitle, tt * (1 - out), (1 - tt) * 60 - out * 40);
+    fx(ai, ta * (1 - out), (1 - ta) * 60 - out * 40);
     const on = p >= CITED_AT[0] && p < CITED_AT[1];
     if (on !== typing.on) {
       typing.on = on;
