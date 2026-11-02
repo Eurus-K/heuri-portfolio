@@ -74,7 +74,7 @@ export const FAQ_SHOTS = {
  */
 export const RESULTS = {
   eyebrow: 'SEO · AEO · GEO',
-  title: 'From brand to search.',
+  title: 'From brand to search',
   stats: [
     { value: '7 / 10', label: '沒提品牌的診所問題<br />AI 主動推薦' },
     { value: '6 / 10', label: 'FAQ、團購、試穿頁<br />成為 AI 引用來源' },
