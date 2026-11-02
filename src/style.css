@@ -41,6 +41,9 @@
   --t-logo: 17px;
 
   --gutter: clamp(16px, 2.6vw, 44px);
+  /* one radius scale: big surfaces, pills; nested elements stay pills */
+  --r-card: 24px;
+  --r-pill: 999px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -258,7 +261,7 @@ body.is-light .logo { color: var(--sheet-ink); }
 }
 .case {
   width: min(86vw, 60vh * 1.92);
-  border-radius: 22px;
+  border-radius: var(--r-card);
   overflow: hidden;
   background: #fff;
   box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.75);
@@ -334,27 +337,54 @@ body.is-light .logo { color: var(--sheet-ink); }
 .cited {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 5vh; padding: 0 var(--gutter);
+  gap: clamp(24px, 4.6vh, 44px); padding: 0 var(--gutter);
   color: var(--fg);
+  text-align: center;
   pointer-events: none;
 }
 .cited > * { opacity: 0; will-change: transform, opacity; }
-.cited__title { font-family: var(--f-zh); font-weight: 500; font-size: var(--t-h2); line-height: 1.35; text-align: center; }
-.ai {
-  width: min(640px, 86vw);
-  background: var(--sheet);
-  color: var(--sheet-ink); /* the card keeps dark ink on the night section */
-  border-radius: 20px;
-  padding: 20px 24px 24px;
-  box-shadow: 0 30px 60px -24px rgba(122, 58, 92, 0.45);
+.cited__eyebrow { font-size: var(--t-label); font-weight: 500; letter-spacing: 0.14em; color: var(--fg-2); }
+.cited__title {
+  margin-top: 12px;
+  font-family: var(--f-en); font-weight: 500;
+  font-size: var(--t-h1); line-height: 1.05; letter-spacing: -0.03em;
 }
-.ai__bar { display: flex; gap: 10px; align-items: center; font-family: var(--f-zh); font-size: 13px; color: #8a6f80; }
-.ai__dotk { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-ink); }
-.ai__q { margin-top: 14px; font-family: var(--f-zh); font-weight: 500; font-size: clamp(17px, 1.35vw, 22px); min-height: 1.5em; }
-.ai__a { margin-top: 10px; font-family: var(--f-zh); font-size: 15px; line-height: 1.8; color: #6d5566; min-height: 5.4em; }
-.ai__a mark { background: rgba(255, 201, 174, 0.55); color: var(--sheet-ink); font-weight: 500; padding: 0 2px; border-radius: 3px; }
+/* the numbers row (Maze's logo row, but evidence) */
+.stats { display: flex; gap: clamp(32px, 7vw, 120px); justify-content: center; }
+.stat__v {
+  font-family: var(--f-en); font-weight: 400;
+  font-size: var(--t-h2); line-height: 1; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.stat__l { margin-top: 10px; font-family: var(--f-zh); font-size: clamp(13px, 0.95vw, 16px); line-height: 1.55; color: var(--fg-2); }
+/* the AI answer: white, like the case card before it */
+.ai {
+  width: min(680px, 86vw);
+  text-align: left;
+  background: #fff;
+  color: var(--sheet-ink);
+  border-radius: var(--r-card);
+  padding: 22px 26px 24px;
+  box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.75);
+}
+.ai__bar { display: flex; justify-content: space-between; align-items: center; }
+.ai__src { display: inline-flex; gap: 8px; align-items: center; font-family: var(--f-zh); font-size: 13px; color: #8a6f80; }
+.ai__dotk { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-ink); }
+.ai__rank { font-family: var(--f-zh); font-size: 12px; font-weight: 500; padding: 5px 11px; border-radius: var(--r-pill); background: #ffe3d6; color: #8a3b52; opacity: 0; transition: opacity 0.5s; }
+.ai__rank.is-on { opacity: 1; }
+/* the query sits in a search field: a pill inside the card */
+.ai__q {
+  margin-top: 16px; padding: 11px 18px;
+  border-radius: var(--r-pill);
+  background: #f5f1ef;
+  font-family: var(--f-zh); font-weight: 500; font-size: clamp(15px, 1.15vw, 19px);
+  min-height: 2.6em;
+}
+.ai__a { margin-top: 16px; font-family: var(--f-zh); font-size: clamp(15px, 1.1vw, 18px); line-height: 1.75; color: #4a3242; min-height: 3.5em; }
+.ai__a mark { background: rgba(255, 201, 174, 0.6); color: var(--sheet-ink); font-weight: 500; padding: 0 3px; border-radius: 4px; }
 .ai__cite { margin-top: 12px; font-size: 13px; font-weight: 500; color: var(--accent-ink); opacity: 0; transition: opacity 0.5s; }
 .ai__cite.is-on { opacity: 1; }
+.cited__note { font-family: var(--f-zh); font-size: 12px; color: var(--fg-3); letter-spacing: 0.02em; }
 
 /* ═════════ MAP ═════════ */
 .map__svg { position: absolute; inset: 0; width: 100%; height: 100%; }

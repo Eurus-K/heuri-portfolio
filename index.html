@@ -68,15 +68,23 @@
             </div>
           </div>
 
-          <!-- after the card: the takeaway and the AI answer, on flat night -->
+          <!-- after the card: the results, on flat night (filled from RESULTS / AI_ANSWER) -->
           <div class="cited" id="cited">
-            <h2 class="cited__title">結構清楚的資訊，<br />才會被 AI 引用與推薦。</h2>
+            <header class="cited__head">
+              <p class="cited__eyebrow" id="resEyebrow"></p>
+              <h2 class="cited__title" id="resTitle"></h2>
+            </header>
+            <div class="stats" id="resStats"></div>
             <div class="ai" id="ai">
-              <div class="ai__bar"><span class="ai__dotk"></span>AI 搜尋測試</div>
+              <div class="ai__bar">
+                <span class="ai__src"><i class="ai__dotk"></i>AI 搜尋測試</span>
+                <span class="ai__rank" id="aiRank"></span>
+              </div>
               <p class="ai__q" id="aiQ"></p>
               <p class="ai__a" id="aiA"></p>
               <p class="ai__cite" id="aiCite"></p>
             </div>
+            <p class="cited__note" id="resNote"></p>
           </div>
         </div>
       </section>

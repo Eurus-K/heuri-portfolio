@@ -10,12 +10,12 @@
  *  CARD         the card rises from below over the line; the sky turns flat night
  *  0.12 ─ 0.27  the FAQ page wipes from Before to After
  *  0.29 ─ 0.42  the After page scrolls down: every question AI can read
- *  0.44 ─ 0.51  the card scrolls up and away; the takeaway rises (still flat night)
- *  0.50 ─ 0.88  the AI answer citing the page
+ *  0.44 ─ 0.51  the card scrolls up and away; the results rise (still flat night)
+ *  0.46 ─ 0.60  title, three numbers, the AI answer (types itself), the test note
  *  0.86 ─ 0.98  flat night fades back into the dusk gradient for the map
  *  (the rose → peach climax layers are kept in the markup, unused for now)
  */
-import { QUESTIONS, TOUCHPOINTS, AI_ANSWER, FAQ_SHOTS } from '../data/content.js';
+import { QUESTIONS, TOUCHPOINTS, AI_ANSWER, FAQ_SHOTS, RESULTS } from '../data/content.js';
 import { range, ease, rng, fx } from '../lib/util.js';
 import { createPile } from '../lib/pile.js';
 
@@ -31,7 +31,7 @@ const LINE = [0.06, 0.077];
 const CARD = [0.082, 0.107];
 const AFTER_SCROLL = [0.29, 0.42];
 const AFTER_END = 0.875; // where the questions end on the full-page capture (the footer starts below)
-const CITED_AT = [0.53, 0.88]; // AI answer types while p is inside this range
+const CITED_AT = [0.55, 0.88]; // AI answer types while p is inside this range
 const Q_MS = 32, A_MS = 18; // per character
 
 export function createNur(root) {
@@ -44,9 +44,19 @@ export function createNur(root) {
   const before = $('#baBefore'), after = $('#baAfter'), line = $('#baLine');
   const tagBefore = $('.ba__tag--before');
   const skyFlat = $('#skyFlat');
-  const citedTitle = $('.cited__title');
+  const resHead = $('.cited__head');
+  const resStats = $('#resStats');
+  const resNote = $('#resNote');
   const ai = $('#ai');
-  const aiQ = $('#aiQ'), aiA = $('#aiA'), aiCite = $('#aiCite');
+  const aiQ = $('#aiQ'), aiA = $('#aiA'), aiCite = $('#aiCite'), aiRank = $('#aiRank');
+
+  $('#resEyebrow').textContent = RESULTS.eyebrow;
+  $('#resTitle').textContent = RESULTS.title;
+  resStats.innerHTML = RESULTS.stats
+    .map((s) => `<div class="stat"><p class="stat__v">${s.value}</p><p class="stat__l">${s.label}</p></div>`)
+    .join('');
+  resNote.textContent = RESULTS.note;
+  aiRank.textContent = AI_ANSWER.rank;
 
   // the four decision touchpoints as glass buttons under the card, FAQ in focus
   $('#caseTabs').innerHTML = TOUCHPOINTS.map(
@@ -88,6 +98,7 @@ export function createNur(root) {
       const ans = AI_ANSWER.answer.slice(0, na).replace(/NURSTYLE/g, '<mark>NURSTYLE</mark>');
       if (aiA._html !== ans) { aiA._html = ans; aiA.innerHTML = ans; }
       aiCite.classList.toggle('is-on', na >= AI_ANSWER.answer.length);
+      aiRank.classList.toggle('is-on', na >= AI_ANSWER.answer.length);
     }
     requestAnimationFrame(loop);
   })(performance.now());
@@ -132,17 +143,21 @@ export function createNur(root) {
     line.style.opacity = v > 0.5 && v < 99.5 ? 1 : 0;
     tagBefore.style.opacity = range(v, 4, 14); // off once the page is all After
 
-    // the takeaway rises as the card leaves, then the AI answer under it
+    // the results rise as the card leaves: title, numbers, AI answer, note
     const tt = ease.out(range(p, 0.46, 0.51));
-    const ta = ease.out(range(p, 0.5, 0.55));
+    const ts = ease.out(range(p, 0.49, 0.54));
+    const ta = ease.out(range(p, 0.52, 0.57));
+    const tn = ease.out(range(p, 0.55, 0.6));
     const out = range(p, 0.85, 0.88);
-    fx(citedTitle, tt * (1 - out), (1 - tt) * 60 - out * 40);
+    fx(resHead, tt * (1 - out), (1 - tt) * 60 - out * 40);
+    fx(resStats, ts * (1 - out), (1 - ts) * 60 - out * 40);
     fx(ai, ta * (1 - out), (1 - ta) * 60 - out * 40);
+    fx(resNote, tn * (1 - out), (1 - tn) * 30 - out * 40);
     const on = p >= CITED_AT[0] && p < CITED_AT[1];
     if (on !== typing.on) {
       typing.on = on;
       typing.start = performance.now();
-      if (!on) { aiQ.textContent = ''; aiA.innerHTML = ''; aiA._html = ''; aiCite.classList.remove('is-on'); }
+      if (!on) { aiQ.textContent = ''; aiA.innerHTML = ''; aiA._html = ''; aiCite.classList.remove('is-on'); aiRank.classList.remove('is-on'); }
     }
   }
 

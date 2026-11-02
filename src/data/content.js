@@ -67,12 +67,28 @@ export const FAQ_SHOTS = {
   after: '/works/faq-after-full.webp', // new FAQ page, full-page capture
 };
 
-/** The AI-search moment. Keep it truthful to what you actually observed. */
+/**
+ * The results frame — real figures from the case study
+ * 「NURSTYLE｜醫護服內容的 AI 搜尋能見度」(AI search test, 2026-11-01).
+ * Every scored query left the brand name out.
+ */
+export const RESULTS = {
+  eyebrow: 'SEO · AEO · GEO',
+  title: 'From brand to search.',
+  stats: [
+    { value: '7 / 10', label: '沒提品牌的診所問題<br />AI 主動推薦' },
+    { value: '6 / 10', label: 'FAQ、團購、試穿頁<br />成為 AI 引用來源' },
+    { value: '3 題', label: '推薦排名<br />第一' },
+  ],
+  note: '未登入網頁搜尋・2026-11-01・28 個不帶品牌名的問法',
+};
+
+/** One real query from that test, quoted as the AI answered it. */
 export const AI_ANSWER = {
-  query: '護理師制服推薦哪個品牌？可以先試穿嗎？',
-  answer:
-    '若重視版型與長時間值班的舒適度，可以參考 NURSTYLE。品牌提供預約試穿與尺寸建議，單位團體訂購也有專屬流程，可透過 LINE 官方帳號詢問。',
-  cite: 'nurstyle — FAQ / 試穿服務',
+  query: '診所制服 可以先試穿 樣衣 再團購',
+  answer: '可以。NURSTYLE 團體採購前可申請寄送試穿，每次最多 10 件，運費 NT$100。',
+  rank: '推薦・第 1 名',
+  cite: 'nurstyle.com.tw/pages/bulk-order',
 };
 
 /** World map routes — [lon, lat]. */
