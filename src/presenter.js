@@ -30,7 +30,8 @@ const BEATS = [
   { s: 'map', p: 0.1, dur: 2.4, note: '把這個能力延伸到下一個問題：餐飲業的第二曲線。' },
   { s: 'map', p: 0.7, dur: 4, note: '台灣餐飲出海 2.0：從輸出服務，到輸出產品、風味與文化價值。' },
   { s: 'map', p: 0.9, dur: 2, note: '問題：沒有 Global BD 團隊，怎麼降低海外市場探索成本？' },
-  { s: 'compass', p: 1, dur: 2.8, note: 'EXPORT COMPASS：我正在開發的 AI 市場探索工作台。從自然語言描述產品，整合定價、通路與買方、法規路徑與同業借鏡。點 Where next 進入 Demo（會開新分頁）。' },
+  { s: 'compass', p: 0.7, dur: 2.8, note: 'EXPORT COMPASS：我正在開發的 AI 市場探索工作台。從自然語言描述產品，整合定價、通路與買方、法規路徑與同業借鏡。點 Where next 進入 Demo（會開新分頁）。' },
+  { s: 'compass', p: 1, dur: 2.2, note: '（結尾）謝謝大家。我是 Eurus。' },
 ];
 const CHAPTER_BEAT = [0, 7, 14, 17];
 

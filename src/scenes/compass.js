@@ -5,10 +5,11 @@
  * the talk ends where it began. The page ends on this frame.
  *
  * Timeline (p, after the shared first screen; see s0 below):
- *  0.00 ─ 0.40  title and compass arrive; needle searches, then settles
- *  0.45 ─ 0.60  the demo pill rises in, then the frame holds to the end
+ *  0.00 ─ 0.30  title and compass arrive; needle searches, then settles
+ *  0.34 ─ 0.45  the demo pill rises in
+ *  0.62 ─ 0.92  the signature: the compass makes room and the name rises
  */
-import { COMPASS } from '../data/content.js';
+import { COMPASS, PROFILE } from '../data/content.js';
 import { range, lerp, ease, fx } from '../lib/util.js';
 import { setCompassSky, setEndGlow } from '../lib/sky.js';
 
@@ -19,6 +20,21 @@ export function createCompass(root) {
   const needle = $('#roseNeedle');
   const ticks = $('#roseTicks');
   const cta = $('#enterDemo');
+  const group = $('#cmpGroup');
+  const sign = $('#sign');
+  const signWord = $('#signWord');
+
+  signWord.textContent = PROFILE.name;
+  $('#signCopy').textContent = `© ${PROFILE.year} ${PROFILE.name}`;
+  $('#signMeta').textContent = `INTERPRETER · ${PROFILE.place}`;
+
+  // the wordmark spans the full width: size it from its measured width
+  const fitSign = () => {
+    signWord.style.fontSize = '100px';
+    const w = signWord.getBoundingClientRect().width;
+    const avail = sign.clientWidth;
+    if (w > 0 && avail > 0) signWord.style.fontSize = `${(100 * avail) / w}px`;
+  };
 
   for (let a = 0; a < 360; a += 15) {
     const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -51,7 +67,7 @@ export function createCompass(root) {
     setEndGlow(raw > 0 ? swap : 0);
 
     // needle: searches, overshoots, settles on a heading
-    const n = range(p, 0.02, 0.4);
+    const n = range(p, 0.02, 0.3);
     const angle = lerp(-140, 52, ease.out(n)) + Math.sin(n * Math.PI * 3) * 18 * (1 - n);
     needle.setAttribute('transform', `rotate(${angle})`);
 
@@ -60,11 +76,20 @@ export function createCompass(root) {
     head.style.marginTop = `${(1 - arrive) * 40}px`;
     rose.style.opacity = arrive;
 
-    const c = ease.out(range(p, 0.45, 0.6));
+    const c = ease.out(range(p, 0.34, 0.45));
     fx(cta, c, (1 - c) * 24);
     cta.classList.toggle('is-live', c > 0.5);
 
+    // the signature: the compass moves up to make room, the name rises from below
+    const s = ease.inOut(range(p, 0.62, 0.92));
+    const room = sign.offsetHeight + innerHeight * 0.06;
+    group.style.transform = `translateY(${-s * room * 0.75}px)`;
+    group.style.opacity = 1 - s;
+    sign.style.transform = `translateY(${(1 - s) * 110}%)`;
+    sign.style.opacity = s;
+
   }
 
-  return { layout: () => update(last < 0 ? 0 : last, true), update, chapter: () => 3 };
+  fitSign();
+  return { layout: () => { fitSign(); update(last < 0 ? 0 : last, true); }, update, chapter: () => 3 };
 }

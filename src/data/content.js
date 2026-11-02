@@ -3,8 +3,9 @@
  * Text that lives in index.html is purely typographic; facts and links live here.
  */
 
+/** The signature at the very end (Maze-style wordmark footer). */
 export const PROFILE = {
-  name: 'YOUR NAME', // ← replace
+  name: 'Eurus',
   role: 'Strategy × Creative × AI',
   place: 'Taipei',
   year: '2026',
