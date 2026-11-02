@@ -391,7 +391,7 @@ body.is-light .logo { color: var(--sheet-ink); }
 .scene--map, .scene--compass { margin-top: -100vh; }
 #scroller { position: relative; z-index: 1; }
 .sky-global { position: fixed; inset: 0; z-index: 0; background: var(--night); opacity: 0; pointer-events: none; overflow: hidden; }
-/* the ending mirrors the opening: the same plum glow, rising from the bottom */
+/* the last scene mirrors the opening: the same plum glow, rising from the bottom */
 .sky-global__end {
   position: absolute; inset: 0; opacity: 0;
   background: radial-gradient(120% 85% at 50% 100%, #3a1c33 0%, var(--bg) 45%, var(--night) 100%);
@@ -451,7 +451,6 @@ body.is-light .logo { color: var(--sheet-ink); }
 .question__zh .accent { font-family: var(--f-en); letter-spacing: -0.02em; }
 
 /* ═════════ COMPASS ═════════ */
-body.is-end .chrome { opacity: 0; } /* the talk ends on a black screen */
 .cmp-group { position: absolute; inset: 0; will-change: transform; }
 .cmp__head {
   position: absolute; left: var(--gutter); top: 50%; transform: translateY(-50%);

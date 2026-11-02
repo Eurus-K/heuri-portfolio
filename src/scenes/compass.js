@@ -1,13 +1,12 @@
 /**
  * 04 EXPORT COMPASS — the last scene. The title and compass arrive, the needle
  * settles on a heading, and a single pill opens the live demo in a new tab.
- * The dawn fades back to night here, and at the very end everything scrolls up
- * and leaves the screen black.
+ * The dawn gives way to the opening's plum glow, mirrored from the bottom, so
+ * the talk ends where it began. The page ends on this frame.
  *
  * Timeline (p, after the shared first screen; see s0 below):
- *  0.00 ─ 0.30  title and compass arrive; needle searches, then settles
- *  0.34 ─ 0.44  the demo pill rises in
- *  0.70 ─ 1.00  everything scrolls up and away, faster than the scroll: black
+ *  0.00 ─ 0.40  title and compass arrive; needle searches, then settles
+ *  0.45 ─ 0.60  the demo pill rises in, then the frame holds to the end
  */
 import { COMPASS } from '../data/content.js';
 import { range, lerp, ease, fx } from '../lib/util.js';
@@ -20,7 +19,6 @@ export function createCompass(root) {
   const needle = $('#roseNeedle');
   const ticks = $('#roseTicks');
   const cta = $('#enterDemo');
-  const group = $('#cmpGroup');
 
   for (let a = 0; a < 360; a += 15) {
     const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -47,11 +45,13 @@ export function createCompass(root) {
     const p = range(raw, s0, 1);
     const arrive = ease.out(range(raw, s0 * 0.85, s0 + 0.04));
 
-    // the dawn from the map fades back to night as the compass arrives
-    setCompassSky(raw > 0 ? 0.65 * (1 - ease.inOut(range(raw, s0 * 0.5, s0 + 0.12))) : null);
+    // the dawn from the map gives way to the closing plum glow as the compass arrives
+    const swap = ease.inOut(range(raw, s0 * 0.5, s0 + 0.12));
+    setCompassSky(raw > 0 ? 0.65 * (1 - swap) : null);
+    setEndGlow(raw > 0 ? swap : 0);
 
     // needle: searches, overshoots, settles on a heading
-    const n = range(p, 0.02, 0.3);
+    const n = range(p, 0.02, 0.4);
     const angle = lerp(-140, 52, ease.out(n)) + Math.sin(n * Math.PI * 3) * 18 * (1 - n);
     needle.setAttribute('transform', `rotate(${angle})`);
 
@@ -60,15 +60,10 @@ export function createCompass(root) {
     head.style.marginTop = `${(1 - arrive) * 40}px`;
     rose.style.opacity = arrive;
 
-    const c = ease.out(range(p, 0.34, 0.44));
+    const c = ease.out(range(p, 0.45, 0.6));
     fx(cta, c, (1 - c) * 24);
     cta.classList.toggle('is-live', c > 0.5);
 
-    // the end: everything scrolls up and away, leaving black
-    const out = ease.inOut(range(p, 0.7, 1));
-    group.style.transform = `translateY(${-out * 110}vh)`;
-    document.body.classList.toggle('is-end', out > 0.6);
-    setEndGlow(out);
   }
 
   return { layout: () => update(last < 0 ? 0 : last, true), update, chapter: () => 3 };
