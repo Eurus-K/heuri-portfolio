@@ -63,8 +63,8 @@ export const QUESTIONS = [
  * Empty = the built-in placeholder screens.
  */
 export const FAQ_SHOTS = {
-  before: '/works/faq-before.webp', // old FAQ page, June 2026
-  after: '/works/faq-after-full.webp', // new FAQ page, full-page capture
+  before: 'works/faq-before.webp', // old FAQ page, June 2026
+  after: 'works/faq-after-full.webp', // new FAQ page, full-page capture
 };
 
 /**
