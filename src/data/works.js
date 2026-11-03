@@ -30,7 +30,7 @@ export const WORKS = [
   { id: 'w04', cat: 'PRINT', title: 'NURSTYLE Vol.16', ratio: 342 / 319, tone: '#2c2228', src: '/works/nurstyle-vol16.webp', size: 0.42 },
   { id: 'w05', cat: 'MUSIC', title: '흥흥흥', ratio: 1254 / 1254, tone: '#2c2228', src: '/works/music-heungheung.webp' },
   { id: 'w06', cat: 'PACK', title: 'Photo to come', ratio: 4 / 5, tone: '#4a3a44' }, // ← phone photo slot 1
-  { id: 'w07', cat: 'PACK', title: 'NURSTYLE Shipping Boxes', ratio: 1395 / 1400, tone: '#2c2228', src: '/works/nurstyle-boxes.webp' },
+  { id: 'w07', cat: 'PACK', title: 'NURSTYLE Shipping Boxes', ratio: 1266 / 1266, tone: '#2c2228', src: '/works/nurstyle-boxes.webp' },
   { id: 'w08', cat: 'AI', title: 'BAD TUTU', ratio: 1254 / 1254, tone: '#2c2228', src: '/works/bad-tutu.webp' },
   { id: 'w09', cat: 'PRINT', title: 'NURSTYLE Vol.01', ratio: 1400 / 1269, tone: '#2c2228', src: '/works/nurstyle-vol01.webp' },
   { id: 'w10', cat: 'BRAND', title: 'Baking Passport', ratio: 1400 / 787, tone: '#2c2228', src: '/works/itri-baking.webp', size: 0.7 },
